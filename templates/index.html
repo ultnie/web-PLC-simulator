@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+    <head>
+        <title>PLC Simulator</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=1080px, shrink-to-fit=yes">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+            crossorigin="anonymous">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    </head>
+    <body>
+        <form method="POST" enctype="multipart/form-data">
+            <div style="padding-bottom: 5px;">
+                <div class="row">
+                    <div class="col"></div>
+                </div>
+            </div>
+            <div class="row" style="height: 70%; padding-bottom: 10px;">
+                <div class="col" style="height: 65vh;">
+                    <textarea type="text" id="poST_code" name="poST_code" placeholder="poST code" autofocus>{{poST_code}}</textarea>
+                </div>
+                <div class="col" style="height: 65vh;">
+                    <textarea type="text" id="Py_code" name="Py_code" placeholder="Py code" readonly>{{Py_code}}</textarea>
+                </div>
+                <div class="col">
+                    <div class="container" style="height: 65vh; overflow: scroll; padding-bottom: 10px;">
+                        <li>
+                            <a>Inputs</a>
+                            <ul class="scroll" id="assetNameMenu">
+                            </ul>
+                        </li>
+                    </div>
+                </div>
+                <div class="col" style="height: 65vh;">
+                    <textarea type="text" id="outputs" name="outputs" placeholder=Outputs readonly></textarea>
+                </div>
+                <script>
+                    $('document').ready(function() {
+                        document.getElementById('poST_code').addEventListener('keydown', function(e) {
+                            if (e.key == 'Tab') {
+                                e.preventDefault();
+                                var start = this.selectionStart;
+                                var end = this.selectionEnd;
+                                this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
+                                this.selectionStart = this.selectionEnd = start + 1;
+                            }
+                        });
+                    })
+                </script>
+                <script>
+                    var sim = {{sim}}
+                    if (sim) {
+                        setInterval(updateOutputs, 1000);
+                    }
+                    function updateOutputs() {
+                        $.get("{{path}}", function(data) {
+                            if (data.trim()) {
+                                $('#outputs').text(data);
+                            }
+                            else {
+                                setTimeout(updateOutputs, 33);
+                            }
+                        });
+                    }
+                    if (sim) {
+                        updateOutputs();
+                    }
+                </script>
+                <script>
+                    var sim = {{sim}}
+                    if (sim) {
+                        updateInputs();
+                    }
+                    function updateInputs() {
+                        $.get("{{inputs}}", function(data) {
+                            if (!data.trim()) {
+                                setTimeout(updateInputs, 1000);
+                            }
+                            else {
+                                var inputs = data.split("\n");
+                                var assetList = $('#assetNameMenu');
+                                $.each(inputs, function(i)
+                                {
+                                    if (inputs[i].trim()) {
+                                        var li = $('<li/>')
+                                            .addClass('ui-menu-item')
+                                            .attr('role', 'menuitem')
+                                            .appendTo(assetList);
+
+                                        var input = $('<input/>')
+                                            .addClass('ui-all')
+                                            .attr('type', 'checkbox')
+                                            .attr('value', inputs[i])
+                                            .attr('name', 'inputcheck')
+                                            .appendTo(li);
+
+                                        var aaa = $('<a/>')
+                                            .addClass('ui-all')
+                                            .text(inputs[i])
+                                            .appendTo(li);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                </script>
+            </div>
+            <div class="row" style="height: 25%;">
+                <div class="col-6" style="height: 100%;">
+                    <textarea type="text" name="out" placeholder="errors"  readonly>{{out}}</textarea>
+                </div>
+                <div class="col">
+                    <div class="row">
+                        <div class="col">
+                            <div class="container">
+                                <label>Translate to Py:</label>
+                            </div>
+                            <div class="container" style="padding-bottom: 2px;">
+                                <button type="submit" class="btn btn-light" name="action" value="translate">Translate</button>
+                            </div>
+                            <div class="container">
+                                <label>Open poST code:</label>
+                                <form action="/" method="POST" enctype="multipart/form-data">
+                                    <input type="file" name="file" style="padding-bottom: 1px;">
+                                </form>
+                                <button type="submit" class="btn btn-light" name="action" value="openPoST">Open</button>
+                            </div>
+                            <div class="container">
+                                <button type="submit" class="btn btn-light" name="action" value="loadInputs"{{disable_inputs}}>Load inputs into simulation</button>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="container">
+                            </div>
+                            <div class="container">
+                                <button type="submit" class="btn btn-light" name="action" value="downloadPoST" {{disable_poST}}>Download poST code</button>
+                            </div>
+                            <div class="container">
+                                <button type="submit" class="btn btn-light" name="action" value="downloadPy" {{disable_Py}}>Download Py code</button>
+                            </div>
+                            <div class="container">
+                                <button type="submit" class="btn btn-light" name="action" value="startSim" {{disable_start}}>Start simulation</button>
+                            </div>
+                            <div class="container">
+                                <button type="submit" class="btn btn-light" name="action" value="stopSim" {{disable_stop}}>Stop simulation</button>
+                            </div>
+                            <div class="container">
+                                <button type="submit" class="btn btn-light" name="action" value="pauseSim" {{disable_pause}}>{{Pause}}</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </body>
+</html>
