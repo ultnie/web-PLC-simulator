@@ -1,5 +1,5 @@
 # Web PLC Simulator
-This is a PLC Simulator made to run translated to Python poST programs bundled together with jar-translator and web interface.
+This is a PLC Simulator made to run translated to Python poST programs bundled together with jar-translator, web interface and Dockerfile for deployment inside of Docker container.
 
 # Reference
 - poST language core: https://github.com/v-bashev/post_core
