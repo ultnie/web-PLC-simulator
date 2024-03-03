@@ -1,4 +1,5 @@
 import os
+import pathlib
 import shutil
 import socket
 import subprocess
@@ -79,7 +80,7 @@ def startSim(user_path):
     if os.path.exists(user_path + "poST_code.py"):
         Py_code = read_from_file(user_path + "poST_code.py")
     out = read_from_file(user_path + "out")
-    open(user_path + "outputs", 'w').close()
+    open(user_path + "output_outputs", 'w').close()
     open(user_path + "inputs", 'w').close()
     open(user_path + "flags", 'w').close()
     sim = True
@@ -87,6 +88,7 @@ def startSim(user_path):
     with open(user_path + 'flags', "w") as f:
         f.write(sim.__str__() + "\n" + pause.__str__() + "\n")
         f.close()
+    print(user_path)
     subprocess.Popen(["./startSim.sh", user_path])
     return render_index(poST_code, Py_code, out, user_path, sim, pause)
 
@@ -104,7 +106,7 @@ def stopSim(user_path):
     with open(user_path + 'flags', "w") as f:
         f.write(sim.__str__() + "\n" + pause.__str__() + "\n")
         f.close()
-    open(user_path + "outputs", 'w').close()
+    open(user_path + "output_outputs", 'w').close()
     open(user_path + "inputs", 'w').close()
     open(user_path + "flags", 'w').close()
     return render_index(poST_code, Py_code, out, user_path, sim, pause)
@@ -208,7 +210,7 @@ def user_post_methods():
 @app.route('/', methods=["GET"])
 def get_main():
     if 'user' in session:
-        user_path = 'sessions/' + str(session['user']) + '/'
+        user_path = './sessions/' + str(session['user']) + '/'
         if os.path.exists(user_path + "code.post"):
             poST_code = read_from_file(user_path + "code.post")
             if os.path.exists(user_path + "poST_code.py"):
@@ -225,15 +227,14 @@ def get_main():
                         pause = False
                 return render_index(poST_code, Py_code, out, user_path, sim, pause)
             return render_index(poST_code, None, None, user_path, False, False)
+        else:
+            pathlib.Path(user_path).mkdir(parents=True, exist_ok=True)
     else:
         session['user'] = uuid.uuid4()
-        user_path = 'sessions/' + str(session['user']) + '/'
-        if not os.path.exists("./sessions"):
-            os.mkdir("./sessions")
-        if not os.path.exists("./" + user_path):
-            os.mkdir("./" + user_path)
-        if not os.path.exists("./" + user_path + 'outputs'):
-            subprocess.run(["touch", user_path + 'outputs'])
+        user_path = './sessions/' + str(session['user']) + '/'
+        pathlib.Path(user_path).mkdir(parents=True, exist_ok=True)
+        if not os.path.exists("./" + user_path + 'output_outputs'):
+            subprocess.run(["touch", user_path + 'output_outputs'])
         if not os.path.exists("./" + user_path + 'inputs'):
             subprocess.run(["touch", user_path + 'inputs'])
         if not os.path.exists("./" + user_path + 'flags'):
@@ -245,13 +246,13 @@ def get_main():
 
 @app.route('/sessions/<session_id>/outputs', methods=["GET"])
 def get_outputs(session_id):
-    if os.path.exists('./sessions/' + session_id + '/outputs'):
-        f = open('./sessions/' + session_id + '/outputs', 'r')
+    if os.path.exists('./sessions/' + session_id + '/output_outputs'):
+        f = open('./sessions/' + session_id + '/output_outputs', 'r')
         text = f.read()
         f.close()
         return Response(text, mimetype='text/plain')
-    subprocess.run(["touch", './sessions/' + session_id + '/outputs'])
-    f = open('./sessions/' + session_id + '/outputs', 'r')
+    subprocess.run(["touch", './sessions/' + session_id + '/output_outputs'])
+    f = open('./sessions/' + session_id + '/output_outputs', 'r')
     text = f.read()
     f.close()
     return Response(text, mimetype='text/plain')
