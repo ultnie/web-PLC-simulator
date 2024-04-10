@@ -246,16 +246,30 @@ def get_main():
 
 @app.route('/sessions/<session_id>/outputs', methods=["GET"])
 def get_outputs(session_id):
-    if os.path.exists('./sessions/' + session_id + '/output_outputs'):
-        f = open('./sessions/' + session_id + '/output_outputs', 'r')
+    if os.path.exists('./sessions/' + session_id + '/output'):
+        f = open('./sessions/' + session_id + '/output', 'r')
         text = f.read()
         f.close()
-        return Response(text, mimetype='text/plain')
-    subprocess.run(["touch", './sessions/' + session_id + '/output_outputs'])
-    f = open('./sessions/' + session_id + '/output_outputs', 'r')
+        return Response(text, mimetype='application/json')
+    subprocess.run(["touch", './sessions/' + session_id + '/output'])
+    f = open('./sessions/' + session_id + '/output', 'r')
     text = f.read()
     f.close()
-    return Response(text, mimetype='text/plain')
+    return Response(text, mimetype='application/json')
+
+
+@app.route('/sessions/<session_id>/states', methods=["GET"])
+def get_states(session_id):
+    if os.path.exists('./sessions/' + session_id + '/states'):
+        f = open('./sessions/' + session_id + '/states', 'r')
+        text = f.read()
+        f.close()
+        return Response(text, mimetype='application/json')
+    subprocess.run(["touch", './sessions/' + session_id + '/states'])
+    f = open('./sessions/' + session_id + '/states', 'r')
+    text = f.read()
+    f.close()
+    return Response(text, mimetype='application/json')
 
 
 @app.route('/sessions/<session_id>/inputs', methods=["GET"])
@@ -264,12 +278,54 @@ def get_inputs(session_id):
         f = open('./sessions/' + session_id + '/inputs', 'r')
         text = f.read()
         f.close()
-        return Response(text, mimetype='text/plain')
+        return Response(text, mimetype='application/json')
     subprocess.run(["touch", './sessions/' + session_id + '/inputs'])
     f = open('./sessions/' + session_id + '/inputs', 'r')
     text = f.read()
     f.close()
-    return Response(text, mimetype='text/plain')
+    return Response(text, mimetype='application/json')
+
+
+@app.route('/sessions/<session_id>/times', methods=["GET"])
+def get_times(session_id):
+    if os.path.exists('./sessions/' + session_id + '/times'):
+        f = open('./sessions/' + session_id + '/times', 'r')
+        text = f.read()
+        f.close()
+        return Response(text, mimetype='application/json')
+    subprocess.run(["touch", './sessions/' + session_id + '/times'])
+    f = open('./sessions/' + session_id + '/times', 'r')
+    text = f.read()
+    f.close()
+    return Response(text, mimetype='application/json')
+
+
+@app.route('/sessions/<session_id>/globvars', methods=["GET"])
+def get_globvars(session_id):
+    if os.path.exists('./sessions/' + session_id + '/glob_vars'):
+        f = open('./sessions/' + session_id + '/glob_vars', 'r')
+        text = f.read()
+        f.close()
+        return Response(text, mimetype='application/json')
+    subprocess.run(["touch", './sessions/' + session_id + '/glob_vars'])
+    f = open('./sessions/' + session_id + '/glob_vars', 'r')
+    text = f.read()
+    f.close()
+    return Response(text, mimetype='application/json')
+
+
+@app.route('/sessions/<session_id>/vars', methods=["GET"])
+def get_vars(session_id):
+    if os.path.exists('./sessions/' + session_id + '/vars'):
+        f = open('./sessions/' + session_id + '/vars', 'r')
+        text = f.read()
+        f.close()
+        return Response(text, mimetype='application/json')
+    subprocess.run(["touch", './sessions/' + session_id + '/vars'])
+    f = open('./sessions/' + session_id + '/vars', 'r')
+    text = f.read()
+    f.close()
+    return Response(text, mimetype='application/json')
 
 
 if __name__ == "__main__":
