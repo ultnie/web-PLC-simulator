@@ -1,41 +1,75 @@
 <!doctype html>
 <html>
-    <head>
-        <title>PLC Simulator</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=1080px, shrink-to-fit=yes">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-            crossorigin="anonymous">
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
-    </head>
+<head>
+    <title>PLC Simulator</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=1080px, shrink-to-fit=yes">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+</head>
     <body>
-        <form method="POST" enctype="multipart/form-data">
-            <div style="padding-bottom: 5px;">
-                <div class="row">
-                    <div class="col"></div>
-                </div>
-            </div>
-            <div class="row" style="height: 70%; padding-bottom: 10px;">
-                <div class="col" style="height: 65vh;">
-                    <textarea type="text" id="poST_code" name="poST_code" placeholder="poST code" autofocus>{{poST_code}}</textarea>
-                </div>
-                <div class="col" style="height: 65vh;">
-                    <textarea type="text" id="Py_code" name="Py_code" placeholder="Py code" readonly>{{Py_code}}</textarea>
-                </div>
-                <div class="col">
-                    <div class="container" style="height: 65vh; overflow: scroll; padding-bottom: 10px;">
-                        <li>
-                            <a>Inputs</a>
-                            <ul class="scroll" id="assetNameMenu">
-                            </ul>
-                        </li>
+<form method="POST" action="/" enctype="multipart/form-data" style="height: 95vh; margin-bottom: 20px;">
+        <div class="row" style="height: 65%; margin-bottom: 20px;">
+            <div class="col-6" style="display: flex; flex-direction: column;">
+                <ul class="nav nav-tabs" id="textTabs" role="tablist" style="margin-bottom: 10px;">
+                    <li class="nav-item"><a class="nav-link active" id="post-tab" data-toggle="tab" href="#post" role="tab">poST Code</a></li>
+                    <li class="nav-item"><a class="nav-link" id="plant-post-tab" data-toggle="tab" href="#plant-post" role="tab">Plant poST Code</a></li>
+                    <li class="nav-item"><a class="nav-link" id="py-tab" data-toggle="tab" href="#py" role="tab">Py Code</a></li>
+                </ul>
+
+                <div class="tab-content" id="textTabsContent" style="flex: 1;">
+                    <div class="tab-pane fade show active" id="post" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
+                        <textarea type="text" id="poST_code" name="poST_code" placeholder="poST code" style="width:100%; height:100%; resize: none; margin-bottom: 10px;">{{poST_code}}</textarea>
+                    </div>
+                    <div class="tab-pane fade" id="plant-post" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
+                        <textarea type="text" id="plant_poST_code" name="plant_poST_code" placeholder="plant poST code" style="width:100%; height:100%; resize: none; margin-bottom: 10px;">{{plant_poST_code}}</textarea>
+                    </div>
+                    <div class="tab-pane fade" id="py" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
+                        <textarea type="text" id="Py_code" name="Py_code" placeholder="Py code" readonly style="width:100%; height:100%; resize: none; margin-bottom: 10px;">{{Py_code}}</textarea>
                     </div>
                 </div>
-                <div class="col" style="height: 65vh;">
-                    <textarea type="text" id="outputs" name="outputs" placeholder=Outputs readonly></textarea>
+            </div>
+            <div class="col-3" style="height: 100%;">
+                <div class="container" style="height: 100%; overflow: scroll; padding-bottom: 10px; margin-bottom: 20px;">
+                    <li>
+                        <a>Inputs</a>
+                        <ul class="scroll" id="assetNameMenu">
+                        </ul>
+                    </li>
                 </div>
+            </div>
+            <div class="col-3" style="height: 100%;">
+                <textarea type="text" id="outputs" name="outputs" placeholder="Outputs" readonly style="height: 100%; padding-bottom: 10px; margin-bottom: 20px;">{{outputs}}</textarea>
+            </div>
+        </div>
+
+        <div class="row" style="height: 30%;">
+            <div class="col-6" style="height: 100%;">
+                <textarea type="text" name="out" placeholder="Errors" readonly style="width:100%; height:100%; resize: none; margin-bottom: 20px;">{{out}}</textarea>
+            </div>
+            <div class="col">
+                <label style="margin-bottom: 10px;">Open poST code:</label>
+                <input type="file" name="file" style="padding-bottom: 1px; margin-bottom: 20px;">
+                <button type="submit" class="btn btn-light" name="action" value="openPoST" style="margin-bottom: 20px; height: 50px;">Open</button>
+            </div>
+            <div class="col">
+                <button type="submit" id="translateButton" class="btn btn-light" name="action" value="translate" style="margin-bottom: 20px; height: 50px;">Translate</button>
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-light" name="action" value="downloadPoST" style="margin-bottom: 20px; height: 50px;">Download poST Code</button>
+                <button type="submit" class="btn btn-light" name="action" value="downloadPy" style="margin-bottom: 20px; height: 50px;">Download Py Code</button>
+                <button type="button" id="loadInputsButton" style="margin-bottom: 20px; height: 50px;">Load Inputs</button>
+            </div>
+            <div class="col">
+                <button type="submit" id="startSimButton" class="btn btn-light" name="action" value="startSim" style="margin-bottom: 20px; height: 50px;">Start Simulation</button>
+                <button type="submit" id="stopSimButton" class="btn btn-light" name="action" value="stopSim" style="margin-bottom: 20px; height: 50px;">Stop Simulation</button>
+                <button type="submit" id="pauseSimButton" class="btn btn-light" name="action" value="pauseSim" style="margin-bottom: 20px; height: 50px;">Pause Simulation</button>
+            </div>
+        </div>
+    </form>
+
                 <script>
                     $('document').ready(function() {
                         document.getElementById('poST_code').addEventListener('keydown', function(e) {
@@ -50,110 +84,253 @@
                     })
                 </script>
                 <script>
-                    var sim = {{sim}}
-                    if (sim) {
-                        setInterval(updateOutputs, 1000);
-                    }
+                    let sim = {{sim}} || false;
+
                     function updateOutputs() {
-                        $.get("{{path}}", function(data) {
-                            if (data.trim()) {
-                                $('#outputs').text(data);
-                            }
-                            else {
-                                setTimeout(updateOutputs, 33);
-                            }
-                        });
-                    }
-                    if (sim) {
-                        updateOutputs();
-                    }
-                </script>
-                <script>
-                    var sim = {{sim}}
-                    if (sim) {
-                        updateInputs();
-                    }
-                    function updateInputs() {
-                        $.get("{{inputs}}", function(data) {
-                            if (!data.trim()) {
-                                setTimeout(updateInputs, 1000);
-                            }
-                            else {
-                                var inputs = data.split("\n");
-                                var assetList = $('#assetNameMenu');
-                                $.each(inputs, function(i)
-                                {
-                                    if (inputs[i].trim()) {
-                                        var li = $('<li/>')
-                                            .addClass('ui-menu-item')
-                                            .attr('role', 'menuitem')
-                                            .appendTo(assetList);
+                        $.get("{{path}}")
+                            .done(function(data) {
+                                console.log("AJAX request successful");
 
-                                        var input = $('<input/>')
-                                            .addClass('ui-all')
-                                            .attr('type', 'checkbox')
-                                            .attr('value', inputs[i])
-                                            .attr('name', 'inputcheck')
-                                            .appendTo(li);
+                                try {
+                                    console.log("Raw data received:", data);
+                                    console.log("Type of data:", typeof data);
 
-                                        var aaa = $('<a/>')
-                                            .addClass('ui-all')
-                                            .text(inputs[i])
-                                            .appendTo(li);
+                                    if (typeof data !== 'object') {
+                                        data = JSON.parse(data); // Parse if it's a string
                                     }
-                                });
+
+                                    let formattedOutput = formatNestedJson(data);
+                                    $('#outputs').text(formattedOutput);
+                                } catch (e) {
+                                    console.error("Error parsing JSON:", e);
+                                    $('#outputs').text("Invalid JSON response");
+                                }
+                            })
+                            .fail(function(xhr, status, error) {
+                                console.error("AJAX error fetching outputs:");
+                                console.error("Status:", status);
+                                console.error("Error:", error);
+                                console.error("Response text:", xhr.responseText);
+                            });
+                    }
+
+                    // Helper function to format nested JSON
+                    function formatNestedJson(obj, indent = 0) {
+                        let formatted = '';
+                        for (const [key, value] of Object.entries(obj)) {
+                            const spaces = ' '.repeat(indent);
+                            if (typeof value === 'object' && value !== null) {
+                                formatted += `${spaces}${key}:\n${formatNestedJson(value, indent + 2)}`;
+                            } else {
+                                formatted += `${spaces}${key}: ${value}\n`;
                             }
+                        }
+                        return formatted;
+                    }
+
+
+                    let inputsLoaded = false;
+
+                    function updateInputs() {
+                        if (inputsLoaded) return; // Stop if inputs are already loaded
+
+                        $.get("{{inputs}}", function(data) {
+                            console.log("Raw input data received:", data);
+
+                            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                                let assetList = $('#assetNameMenu');
+                                assetList.empty();
+
+                                $.each(data, function(key, value) {
+                                    let li = $('<li/>').addClass('ui-menu-item').attr('role', 'menuitem');
+
+                                    let input;
+                                    if (typeof value === 'boolean') {
+                                        input = $('<input/>')
+                                            .attr('type', 'checkbox')
+                                            .prop('checked', value);
+                                    } else if (typeof value === 'number') {
+                                        input = $('<input/>')
+                                            .attr('type', 'number')
+                                            .val(value);
+                                    } else {
+                                        input = $('<input/>')
+                                            .attr('type', 'text')
+                                            .val(value);
+                                    }
+
+                                    input.addClass('ui-all').attr('name', key).appendTo(li);
+
+                                    $('<label/>')
+                                        .addClass('ui-all')
+                                        .text(`${key}: ${value}`)
+                                        .appendTo(li);
+
+                                    li.appendTo(assetList);
+                                });
+
+                                inputsLoaded = true; // Mark as loaded only on non-empty response
+                                console.log("Inputs updated successfully");
+                            } else {
+                                console.warn("Empty or invalid input data received — will retry");
+                                setTimeout(updateInputs, 1000); // Retry if empty JSON
+                            }
+                        }).fail(function(err) {
+                            console.error("AJAX error fetching inputs:", err);
+                            setTimeout(updateInputs, 1000); // Retry if AJAX fails
                         });
                     }
+
+                    let outputsInterval;
+
+                    function setSimState(state) {
+                        console.log("setSimState called with state:", state);
+                        sim = state;
+                        $("input[name='sim']").val(sim);
+                        if (sim) {
+                            console.log("Forcing start of intervals"); // Debugging line
+                            outputsInterval = setInterval(function() {
+                                console.log("updateOutputs interval running");
+                                updateOutputs();
+                            }, 1000);
+                            updateInputs();
+                            console.log("updateOutputs function:", updateOutputs);
+                        } else {
+                            console.log("Stopping intervals");
+                            clearInterval(outputsInterval);
+                        }
+                    }
+
+
+                    $(document).ready(function() {
+                        // Disable/enable buttons based on sim state and PyCode content
+                        function updateButtonStates() {
+                        console.log("Updating button states. Current sim state:", sim);
+                        let pyCodeNotEmpty = $('#Py_code').val().trim().length > 0;
+                        $('#startSimButton').prop('disabled', sim || !pyCodeNotEmpty); // Start only enabled when sim is false and PyCode has content
+                        $('#pauseSimButton').prop('disabled', !sim);                  // Pause only active when sim is running
+                        $('#stopSimButton').prop('disabled', !sim);                   // Stop only active when sim is running
+                        $('#loadInputsButton').prop('disabled', !sim);                // Load Inputs only enabled when sim is running
+
+                        // Simplified functionality: run setSimState with current sim value
+                        setSimState(sim);
+                    }
+
+                        // Update button states on page load
+                        updateButtonStates();
+
+                        // Watch for changes in PyCode text field
+                        $('#poST_code').on('input', function() {
+                            updateButtonStates();
+                        });
+
+                        $('#startSimButton').click(function(e) {
+                            e.preventDefault();
+                            console.log("Starting simulation");
+
+                            $.ajax({
+                                type: "POST",
+                                url: "/",
+                                data: { action: 'startSim', pyCode: $('#poST_code').val() },
+                                success: function(response) {
+                                    console.log("Server response:", response);
+                                    setSimState(true); // Set sim flag to true
+                                    updateButtonStates();
+                                },
+                                error: function(err) {
+                                    console.error("Error starting simulation:", err);
+                                }
+                            });
+                        });
+
+                        $('#pauseSimButton').click(function(e) {
+                            e.preventDefault();
+                            console.log("Toggling simulation pause state");
+
+                            $.ajax({
+                                type: "POST",
+                                url: "/",
+                                data: { action: 'pauseSim' },
+                                success: function(response) {
+                                    console.log("Simulation pause state toggled:", response);
+                                },
+                                error: function(err) {
+                                    console.error("Error pausing/unpausing simulation:", err);
+                                }
+                            });
+                        });
+
+                        $('#stopSimButton').click(function(e) {
+                            e.preventDefault();
+                            console.log("Stopping simulation");
+
+                            $.ajax({
+                                type: "POST",
+                                url: "/",
+                                data: { action: 'stopSim' },
+                                success: function(response) {
+                                    console.log("Simulation stopped:", response);
+                                    sim = false; // Ensure sim flag is set to false
+                                    setSimState(false); // Just in case this also controls more states
+                                    updateButtonStates(); // Update button states
+                                    console.log("Button states updated. Sim flag is now:", sim);
+                                },
+                                error: function(err) {
+                                    console.error("Error stopping simulation:", err);
+                                }
+                            });
+                        });
+
+                        $('#loadInputsButton').click(function(e) {
+                            e.preventDefault();
+                            console.log("Loading inputs");
+
+                            let inputs = {};
+
+                            // Collect inputs from the assetNameMenu list
+                            $('#assetNameMenu input').each(function() {
+                                let name = $(this).attr('name');
+                                let type = $(this).attr('type');
+                                let value;
+
+                                if (type === 'checkbox') {
+                                    value = $(this).is(':checked');
+                                } else if (type === 'number') {
+                                    value = parseFloat($(this).val());
+                                } else {
+                                    value = $(this).val();
+                                }
+
+                                inputs[name] = value;
+                            });
+
+                            console.log("Inputs JSON:", inputs);
+
+                            // Form data payload
+                            let formData = new FormData();
+                            formData.append("action", "loadInputs");
+                            formData.append("inputs", JSON.stringify(inputs));
+
+                            $.ajax({
+                                type: "POST",
+                                url: "/",                 // Same route for multiple actions
+                                processData: false,       // Don't convert to query string
+                                contentType: false,       // Let the browser set content type
+                                data: formData,           // Send as multipart/form-data
+                                success: function(response) {
+                                    console.log("Inputs loaded successfully:", response);
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error("Error loading inputs:", xhr.responseText);
+                                }
+                            });
+                        });
+                    });
+
+                    function toggleSimState() {
+                        setSimState(!sim);
+                        $("input[name='sim']").val(sim);
+                    }
                 </script>
-            </div>
-            <div class="row" style="height: 25%;">
-                <div class="col-6" style="height: 100%;">
-                    <textarea type="text" name="out" placeholder="errors"  readonly>{{out}}</textarea>
-                </div>
-                <div class="col">
-                    <div class="row">
-                        <div class="col">
-                            <div class="container">
-                                <label>Translate to Py:</label>
-                            </div>
-                            <div class="container" style="padding-bottom: 2px;">
-                                <button type="submit" class="btn btn-light" name="action" value="translate">Translate</button>
-                            </div>
-                            <div class="container">
-                                <label>Open poST code:</label>
-                                <form action="/" method="POST" enctype="multipart/form-data">
-                                    <input type="file" name="file" style="padding-bottom: 1px;">
-                                </form>
-                                <button type="submit" class="btn btn-light" name="action" value="openPoST">Open</button>
-                            </div>
-                            <div class="container">
-                                <button type="submit" class="btn btn-light" name="action" value="loadInputs"{{disable_inputs}}>Load inputs into simulation</button>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="container">
-                            </div>
-                            <div class="container">
-                                <button type="submit" class="btn btn-light" name="action" value="downloadPoST" {{disable_poST}}>Download poST code</button>
-                            </div>
-                            <div class="container">
-                                <button type="submit" class="btn btn-light" name="action" value="downloadPy" {{disable_Py}}>Download Py code</button>
-                            </div>
-                            <div class="container">
-                                <button type="submit" class="btn btn-light" name="action" value="startSim" {{disable_start}}>Start simulation</button>
-                            </div>
-                            <div class="container">
-                                <button type="submit" class="btn btn-light" name="action" value="stopSim" {{disable_stop}}>Stop simulation</button>
-                            </div>
-                            <div class="container">
-                                <button type="submit" class="btn btn-light" name="action" value="pauseSim" {{disable_pause}}>{{Pause}}</button>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
     </body>
 </html>

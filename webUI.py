@@ -5,11 +5,15 @@ import shutil
 import socket
 import subprocess
 import uuid
+import psutil
 
-from flask import Flask, render_template, session, request, send_file, Response
+from flask import Flask, render_template, session, request, send_file, Response, jsonify
 
 app = Flask(__name__)
 app.secret_key = 'web-poST Simulator'.encode()
+
+# Store the simulation process globally
+simulation_process = None
 
 
 def copytree(src, dst, symlinks=False, ignore=None):
@@ -120,7 +124,7 @@ def run_program(clientSocket, user_path):
     if os.path.exists(user_path + "poST_code.py"):
         Py_code = read_from_file(user_path + "poST_code.py")
     out = read_from_file(user_path + "out")
-    open(user_path + "output_outputs", 'w').close()
+    open(user_path + "output", 'w').close()
     open(user_path + "inputs", 'w').close()
     open(user_path + "flags", 'w').close()
     sim = True
@@ -130,7 +134,7 @@ def run_program(clientSocket, user_path):
         f.close()
     print(user_path)
     subprocess.Popen(["./startSim.sh", user_path])
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    return render_index(poST_code, Py_code, out, user_path, sim, pause)
 
 
 def stopSim(user_path):
@@ -170,41 +174,117 @@ def pauseSim(user_path):
     return render_index(poST_code, Py_code, out, user_path, sim, pause)
 
 
-def pause_program(user_path):
-    poST_code = request.form["poST_code"]
-    Py_code = None
-    if os.path.exists(user_path + "poST_code.py"):
-        Py_code = read_from_file(user_path + "poST_code.py")
-    out = read_from_file(user_path + "out")
-    sim = True
-    with open(user_path + 'flags', "r") as f:
-        strs = f.read().splitlines()
-        f.close()
-        pause = (strs[1] == "True")
-        pause = not pause
-    with open(user_path + 'flags', "w") as f:
-        f.write(sim.__str__() + "\n" + pause.__str__() + "\n")
-        f.close()
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+def startSimJSON(user_path):
+    global simulation_process
+    try:
+        if not user_path.endswith('/'):
+            user_path += '/'
+
+        if not os.path.exists(user_path + "sim"):
+            os.makedirs(user_path + "sim")
+
+        copytree("./sim", user_path + "sim")
+
+        if not os.path.exists(user_path + "poST_code.py"):
+            raise FileNotFoundError(f"File not found: {user_path}poST_code.py")
+
+        shutil.copyfile(user_path + "poST_code.py", user_path + "sim/poST_code.py")
+
+        open(user_path + "output_outputs", 'w').close()
+        open(user_path + "inputs", 'w').close()
+        open(user_path + "flags", 'w').close()
+
+        print('Files created')
+
+        sim = True
+        pause = False
+
+        with open(user_path + "flags", "w") as f:
+            f.write(f"{sim}\n{pause}\n")
+
+        print('Flags created')
+        print(user_path)
+
+        # Start subprocess and store it
+        simulation_process = subprocess.Popen(["./startSim.sh", user_path])
+
+        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return json.dumps({'success': False, 'error': str(e)}), 400, {'ContentType': 'application/json'}
+
+def pauseSimJSON(user_path):
+    try:
+        sim = True
+
+        # Check if 'flags' file exists
+        flags_path = user_path + 'flags'
+        if not os.path.exists(flags_path):
+            raise FileNotFoundError(f"Flags file not found at: {flags_path}")
+
+        with open(flags_path, "r") as f:
+            strs = f.read().splitlines()
+            if len(strs) < 2:
+                raise ValueError("Invalid content in flags file")
+            pause = (strs[1] == "True")
+            pause = not pause
+
+        with open(flags_path, "w") as f:
+            f.write(f"{sim}\n{pause}\n")
+
+        print("Simulation paused:", pause)
+        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+
+    except Exception as e:
+        print(f"Error in pauseSimJSON: {e}")
+        return json.dumps({'success': False, 'error': str(e)}), 400, {'ContentType': 'application/json'}
 
 
-def stop_program(user_path):
-    poST_code = request.form["poST_code"]
-    Py_code = None
-    out = None
-    if os.path.exists(user_path + "poST_code.py"):
-        Py_code = read_from_file(user_path + "poST_code.py")
-    if os.path.exists(user_path + "out"):
-        out = read_from_file(user_path + "out")
-    sim = False
-    pause = False
-    with open(user_path + 'flags', "w") as f:
-        f.write(sim.__str__() + "\n" + pause.__str__() + "\n")
-        f.close()
-    open(user_path + "output_outputs", 'w').close()
-    open(user_path + "inputs", 'w').close()
-    open(user_path + "flags", 'w').close()
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+def stopSimJSON(user_path):
+    global simulation_process
+    try:
+        sim = False
+        pause = False
+
+        flags_path = user_path + 'flags'
+        output_path = user_path + 'output_outputs'
+        inputs_path = user_path + 'inputs'
+
+        with open(flags_path, "w") as f:
+            f.write(f"{sim}\n{pause}\n")
+
+        open(output_path, 'w').close()
+        open(inputs_path, 'w').close()
+        open(flags_path, 'w').close()
+
+        # Kill the process and any child processes
+        if simulation_process and simulation_process.poll() is None:
+            parent = psutil.Process(simulation_process.pid)
+            children = parent.children(recursive=True)
+            for child in children:
+                print(f"Killing child process {child.pid}")
+                child.terminate()
+            parent.terminate()
+
+            # Ensure processes are cleaned up
+            gone, still_alive = psutil.wait_procs(children, timeout=5)
+            if still_alive:
+                for child in still_alive:
+                    print(f"Force killing child process {child.pid}")
+                    child.kill()
+
+            simulation_process.wait()
+            print("Simulation process and all children terminated")
+
+        simulation_process = None
+
+        print("Simulation stopped")
+        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+
+    except Exception as e:
+        print(f"Error in stopSimJSON: {e}")
+        return json.dumps({'success': False, 'error': str(e)}), 400, {'ContentType': 'application/json'}
 
 
 def translate(clientSocket, user_path):
@@ -254,27 +334,41 @@ def loadInputs(user_path):
     return render_index(poST_code, Py_code, out, user_path, sim, pause)
 
 
-def loadInputs_no_new_page(user_path):
-    with open(user_path + "sim_in", "w") as f:
-        f.write("\n".join(request.form.getlist('inputcheck')))
-        f.close()
-    poST_code = request.form["poST_code"]
-    Py_code = None
-    if os.path.exists(user_path + "poST_code.py"):
-        Py_code = read_from_file(user_path + "poST_code.py")
-    out = read_from_file(user_path + "out")
-    with open(user_path + "flags", "r") as f:
-        strs = f.read().splitlines()
-        f.close()
-        sim = (strs[0] == "True")
-        pause = (strs[1] == "True")
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+def loadInputsJSON(user_path):
+    try:
+        # Debugging
+        print(f"Content-Type: {request.content_type}")
+        print(f"Raw data: {request.form}")
+
+        # We no longer check for application/json — the server expects form data
+        if "action" not in request.form:
+            raise ValueError("No action provided in form data")
+
+        action = request.form["action"]
+        if action != "loadInputs":
+            raise ValueError(f"Unexpected action: {action}")
+
+        # Parse the JSON string from the form field
+        inputs = json.loads(request.form["inputs"])
+        print("Received inputs:", inputs)
+
+        # Save inputs into sim_in
+        with open(user_path + "/sim_in", "w") as f:
+            json.dump(inputs, f, indent=4)
+
+        return jsonify(success=True)
+
+    except Exception as e:
+        print(f"Error loading inputs: {e}")
+        return jsonify(success=False, error=str(e)), 400
 
 
 @app.route('/', methods=["POST"])
 def user_post_methods():
     clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     user_path = 'sessions/' + str(session['user']) + '/'
+
+    print(request, request.form['action'])
 
     if request.form["action"] == "translate":
         return translate(clientSocket, user_path)
@@ -289,13 +383,13 @@ def user_post_methods():
         return send_file(user_path + "poST_code.py", download_name='poST_code.py', as_attachment=True)
 
     elif request.form["action"] == "startSim":
-        return startSim(user_path)
+        return startSimJSON(user_path)
 
     elif request.form["action"] == "stopSim":
-        return stopSim(user_path)
+        return stopSimJSON(user_path)
 
     elif request.form["action"] == "pauseSim":
-        return pauseSim(user_path)
+        return pauseSimJSON(user_path)
 
     elif request.form["action"] == "runProgram":
         return run_program(clientSocket, user_path)
@@ -307,10 +401,8 @@ def user_post_methods():
         return pause_program(user_path)
 
     elif request.form["action"] == "loadInputs":
-        return loadInputs(user_path)
-
-    elif request.form["action"] == "loadInputs_no_new_page":
-        return loadInputs_no_new_page(user_path)
+        print("loading inputs")
+        return loadInputsJSON(user_path)
 
 
 @app.route('/', methods=["GET"])
@@ -339,10 +431,11 @@ def get_main():
         session['user'] = uuid.uuid4()
         user_path = './sessions/' + str(session['user']) + '/'
         pathlib.Path(user_path).mkdir(parents=True, exist_ok=True)
+        # TODO: создать остальные файлы выводов (просто на всякий, так-то их создаст симулятор)
         if not os.path.exists("./" + user_path + 'output'):
-            subprocess.run(["touch", user_path + 'output'])
+            open(user_path + "/output", 'w').close()
         if not os.path.exists("./" + user_path + 'inputs'):
-            subprocess.run(["touch", user_path + 'inputs'])
+            open(user_path + "/inputs", 'w').close()
         if not os.path.exists("./" + user_path + 'flags'):
             with open(user_path + 'flags', "w") as f:
                 f.write(False.__str__() + "\n" + False.__str__() + "\n")
@@ -352,13 +445,13 @@ def get_main():
 
 @app.route('/sessions/<session_id>/outputs', methods=["GET"])
 def get_outputs(session_id):
-    if os.path.exists('./sessions/' + session_id + '/output'):
-        f = open('./sessions/' + session_id + '/output', 'r')
+    if os.path.exists('./sessions/' + session_id + '/all'):
+        f = open('./sessions/' + session_id + '/all', 'r')
         text = f.read()
         f.close()
         return Response(text, mimetype='application/json')
-    subprocess.run(["touch", './sessions/' + session_id + '/output'])
-    f = open('./sessions/' + session_id + '/output', 'r')
+    subprocess.run(["touch", './sessions/' + session_id + '/all'])
+    f = open('./sessions/' + session_id + '/all', 'r')
     text = f.read()
     f.close()
     return Response(text, mimetype='application/json')
