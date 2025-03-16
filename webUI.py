@@ -274,7 +274,7 @@ def stopSimJSON(user_path):
                     print(f"Force killing child process {child.pid}")
                     child.kill()
 
-            simulation_process.wait()
+            simulation_process[user_path].wait()
             print("Simulation process and all children terminated")
 
         simulation_process = None
