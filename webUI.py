@@ -277,7 +277,7 @@ def stopSimJSON(user_path):
             simulation_process[user_path].wait()
             print("Simulation process and all children terminated")
 
-        simulation_process = None
+        simulation_process[user_path] = None
 
         print("Simulation stopped")
         return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
