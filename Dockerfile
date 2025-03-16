@@ -9,6 +9,7 @@ COPY translate.sh translate.sh
 COPY startSim.sh startSim.sh
 COPY templates/index.html templates/index.html
 COPY static/ static/
+COPY sim/ sim/
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 EXPOSE 5000
