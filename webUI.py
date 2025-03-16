@@ -259,8 +259,8 @@ def stopSimJSON(user_path):
         open(flags_path, 'w').close()
 
         # Kill the process and any child processes
-        if simulation_process and simulation_process.poll() is None:
-            parent = psutil.Process(simulation_process.pid)
+        if simulation_process[user_path] and simulation_process[user_path].poll() is None:
+            parent = psutil.Process(simulation_process[user_path].pid)
             children = parent.children(recursive=True)
             for child in children:
                 print(f"Killing child process {child.pid}")
