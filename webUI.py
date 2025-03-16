@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.secret_key = 'web-poST Simulator'.encode()
 
 # Store the simulation process globally
-simulation_process = None
+simulation_process = {}
 
 
 def copytree(src, dst, symlinks=False, ignore=None):
