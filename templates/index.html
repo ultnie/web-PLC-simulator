@@ -10,13 +10,14 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 </head>
     <body>
-<form method="POST" action="/" enctype="multipart/form-data" style="height: 95vh; margin-bottom: 20px;">
+    <form method="POST" action="/" enctype="multipart/form-data" style="height: 95vh; margin-bottom: 20px;">
         <div class="row" style="height: 65%; margin-bottom: 20px;">
             <div class="col-6" style="display: flex; flex-direction: column;">
                 <ul class="nav nav-tabs" id="textTabs" role="tablist" style="margin-bottom: 10px;">
                     <li class="nav-item"><a class="nav-link active" id="post-tab" data-toggle="tab" href="#post" role="tab">poST Code</a></li>
                     <li class="nav-item"><a class="nav-link" id="plant-post-tab" data-toggle="tab" href="#plant-post" role="tab">Plant poST Code</a></li>
                     <li class="nav-item"><a class="nav-link" id="py-tab" data-toggle="tab" href="#py" role="tab">Py Code</a></li>
+                    <li class="nav-item"><a class="nav-link" id="plant-py-tab" data-toggle="tab" href="#plant-py" role="tab">Plant Py Code</a></li>
                 </ul>
 
                 <div class="tab-content" id="textTabsContent" style="flex: 1;">
@@ -29,25 +30,67 @@
                     <div class="tab-pane fade" id="py" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
                         <textarea type="text" id="Py_code" name="Py_code" placeholder="Py code" readonly style="width:100%; height:100%; resize: none; margin-bottom: 10px;">{{Py_code}}</textarea>
                     </div>
+                    <div class="tab-pane fade" id="plant-py" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
+                        <textarea type="text" id="plant_Py_code" name="Py_code" placeholder="Plant Py code" readonly style="width:100%; height:100%; resize: none; margin-bottom: 10px;">{{plant_Py_code}}</textarea>
+                    </div>
                 </div>
             </div>
-            <div class="col-3" style="height: 100%;">
-                <div class="container" style="height: 100%; overflow: scroll; padding-bottom: 10px; margin-bottom: 20px;">
-                    <li>
-                        <a>Inputs</a>
-                        <ul class="scroll" id="assetNameMenu">
-                        </ul>
-                    </li>
+
+            <div class="col-3" style="height:90%; resize:none; margin-bottom: 10px;">
+                <ul class="nav nav-tabs" id="inputTabs" role="tablist">
+                    <li class="nav-item"><a class="nav-link active" id="post-input-tab" data-toggle="tab" href="#post-input" role="tab">poST Inputs</a></li>
+                    <li class="nav-item"><a class="nav-link" id="plant-input-tab" data-toggle="tab" href="#plant-input" role="tab">Plant Inputs</a></li>
+                    <li class="nav-item"><a class="nav-link" id="globals-input-tab" data-toggle="tab" href="#globals-input" role="tab">Global Inputs</a></li>
+                </ul>
+                <div class="tab-content" id="inputTabsContent" style="height: 100%; max-height: 100%; overflow: scroll;">
+                    <div class="tab-pane fade show active" id="post-input" role="tabpanel" style="height: 100%;">
+                            <ul class="list-group border" id="assetNameMenu" style="width:100%; height:100%;">
+                            </ul>
+                    </div>
+
+                    <div class="tab-pane fade" id="plant-input" role="tabpanel" style="height: 100%;">
+                            <ul class="list-group border" id="plant_assetNameMenu" style="width:100%; height:100%;">
+                            </ul>
+                    </div>
+
+                    <div class="tab-pane fade" id="globals-input" role="tabpanel" style="height: 100%;">
+                        <ul class="list-group border" id="globals_assetNameMenu" style="width:100%; height:100%;"></ul>
+                    </div>
                 </div>
             </div>
-            <div class="col-3" style="height: 100%;">
-                <textarea type="text" id="outputs" name="outputs" placeholder="Outputs" readonly style="height: 100%; padding-bottom: 10px; margin-bottom: 20px;">{{outputs}}</textarea>
+
+            <div class="col-3" style="display: flex; flex-direction: column;">
+                <ul class="nav nav-tabs" id="outputTabs" role="tablist" style="margin-bottom: 10px;">
+                    <li class="nav-item"><a class="nav-link active" id="post-output-tab" data-toggle="tab" href="#post-output" role="tab">poST Outputs</a></li>
+                    <li class="nav-item"><a class="nav-link" id="plant-output-tab" data-toggle="tab" href="#plant-output" role="tab">Plant Outputs</a></li>
+                </ul>
+                <div class="tab-content" id="outputTabsContent" style="flex: 1;">
+                    <div class="tab-pane fade show active" id="post-output" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
+                        <textarea type="text" id="outputs" name="outputs" placeholder="Outputs" readonly
+                            style="width:100%; height:100%; resize: none; margin-bottom: 10px;"></textarea>
+                    </div>
+                    <div class="tab-pane fade" id="plant-output" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
+                        <textarea type="text" id="plant_outputs" name="plant_outputs" placeholder="Plant Outputs" readonly
+                            style="width:100%; height:100%; resize: none; margin-bottom: 10px;"></textarea>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="row" style="height: 30%;">
-            <div class="col-6" style="height: 100%;">
-                <textarea type="text" name="out" placeholder="Errors" readonly style="width:100%; height:100%; resize: none; margin-bottom: 20px;">{{out}}</textarea>
+            <div class="col-6" style="display: flex; flex-direction: column;">
+                <ul class="nav nav-tabs" id="errorTabs" role="tablist" style="margin-bottom: 10px;">
+                    <li class="nav-item"><a class="nav-link active" id="post-error-tab" data-toggle="tab" href="#post-error" role="tab">poST Outputs</a></li>
+                    <li class="nav-item"><a class="nav-link" id="plant-error-tab" data-toggle="tab" href="#plant-error" role="tab">Plant Outputs</a></li>
+                </ul>
+                <div class="tab-content" id="errorTabsContent" style="flex: 1;">
+                    <div class="tab-pane fade show active" id="post-error" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
+                        <textarea type="text" name="out" placeholder="PoST Errors" readonly style="width:100%; height:100%; resize: none; margin-bottom: 10px;">{{out}}</textarea>
+                    </div>
+                    <div class="tab-pane fade" id="plant-error" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
+                        <textarea type="text" name="plant_out" placeholder="Plant Errors" readonly style="width:100%; height:100%; resize: none; margin-bottom: 10px;">{{plant_out}}</textarea>
+                    </div>
+                </div>
             </div>
             <div class="col">
                 <label style="margin-bottom: 10px;">Open poST code:</label>
@@ -86,8 +129,9 @@
                 <script>
                     let sim = {{sim}} || false;
 
+                    //TODO: update plant Outputs as well
                     function updateOutputs() {
-                        $.get("{{path}}")
+                        $.get("{{outputs}}")
                             .done(function(data) {
                                 console.log("AJAX request successful");
 
@@ -104,6 +148,32 @@
                                 } catch (e) {
                                     console.error("Error parsing JSON:", e);
                                     $('#outputs').text("Invalid JSON response");
+                                }
+                            })
+                            .fail(function(xhr, status, error) {
+                                console.error("AJAX error fetching outputs:");
+                                console.error("Status:", status);
+                                console.error("Error:", error);
+                                console.error("Response text:", xhr.responseText);
+                            });
+
+                            $.get("{{plant_outputs}}")
+                            .done(function(data) {
+                                console.log("AJAX request successful");
+
+                                try {
+                                    console.log("Raw data received:", data);
+                                    console.log("Type of data:", typeof data);
+
+                                    if (typeof data !== 'object') {
+                                        data = JSON.parse(data); // Parse if it's a string
+                                    }
+
+                                    let formattedOutput = formatNestedJson(data);
+                                    $('#plant_outputs').text(formattedOutput);
+                                } catch (e) {
+                                    console.error("Error parsing JSON:", e);
+                                    $('#plant_outputs').text("Invalid JSON response");
                                 }
                             })
                             .fail(function(xhr, status, error) {
@@ -130,7 +200,10 @@
 
 
                     let inputsLoaded = false;
+                    let plant_inputsLoaded = false;
+                    let globalsLoaded = false;
 
+                    //TODO: update plant Inputs as well
                     function updateInputs() {
                         if (inputsLoaded) return; // Stop if inputs are already loaded
 
@@ -181,6 +254,106 @@
                         });
                     }
 
+                    function updatePlantInputs() {
+                        if (plant_inputsLoaded) return; // Stop if inputs are already loaded
+
+                        $.get("{{plant_inputs}}", function(data) {
+                            console.log("Raw input data received:", data);
+
+                            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                                let assetList = $('#plant_assetNameMenu');
+                                assetList.empty();
+
+                                $.each(data, function(key, value) {
+                                    let li = $('<li/>').addClass('ui-menu-item').attr('role', 'menuitem');
+
+                                    let input;
+                                    if (typeof value === 'boolean') {
+                                        input = $('<input/>')
+                                            .attr('type', 'checkbox')
+                                            .prop('checked', value);
+                                    } else if (typeof value === 'number') {
+                                        input = $('<input/>')
+                                            .attr('type', 'number')
+                                            .val(value);
+                                    } else {
+                                        input = $('<input/>')
+                                            .attr('type', 'text')
+                                            .val(value);
+                                    }
+
+                                    input.addClass('ui-all').attr('name', key).appendTo(li);
+
+                                    $('<label/>')
+                                        .addClass('ui-all')
+                                        .text(`${key}: ${value}`)
+                                        .appendTo(li);
+
+                                    li.appendTo(assetList);
+                                });
+
+                                plant_inputsLoaded = true; // Mark as loaded only on non-empty response
+                                console.log("Plant inputs updated successfully");
+                            } else {
+                                console.warn("Empty or invalid input data received — will retry");
+                                setTimeout(updatePlantInputs, 1000); // Retry if empty JSON
+                            }
+                        }).fail(function(err) {
+                            console.error("AJAX error fetching inputs:", err);
+                            setTimeout(updatePlantInputs, 1000); // Retry if AJAX fails
+                        });
+                    }
+
+                    function updateGlobals() {
+                        if (globalsLoaded) return; // Stop if inputs are already loaded
+
+                        $.get("{{globals}}", function(data) {
+                            console.log("Raw input data received:", data);
+
+                            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                                let assetList = $('#globals_assetNameMenu');
+                                assetList.empty();
+
+                                $.each(data, function(key, value) {
+                                    let li = $('<li/>').addClass('ui-menu-item').attr('role', 'menuitem');
+
+                                    let input;
+                                    if (typeof value === 'boolean') {
+                                        input = $('<input/>')
+                                            .attr('type', 'checkbox')
+                                            .prop('checked', value);
+                                    } else if (typeof value === 'number') {
+                                        input = $('<input/>')
+                                            .attr('type', 'number')
+                                            .val(value);
+                                    } else {
+                                        input = $('<input/>')
+                                            .attr('type', 'text')
+                                            .val(value);
+                                    }
+
+                                    input.addClass('ui-all').attr('name', key).appendTo(li);
+
+                                    $('<label/>')
+                                        .addClass('ui-all')
+                                        .text(`${key}: ${value}`)
+                                        .appendTo(li);
+
+                                    li.appendTo(assetList);
+                                });
+
+                                plant_inputsLoaded = true; // Mark as loaded only on non-empty response
+                                console.log("Globals updated successfully");
+                            } else {
+                                console.warn("Empty or invalid input data received — will retry");
+                                setTimeout(updateGlobals, 1000); // Retry if empty JSON
+                            }
+                        }).fail(function(err) {
+                            console.error("AJAX error fetching inputs:", err);
+                            setTimeout(updateGlobals, 1000); // Retry if AJAX fails
+                        });
+                    }
+
                     let outputsInterval;
 
                     function setSimState(state) {
@@ -194,6 +367,8 @@
                                 updateOutputs();
                             }, 1000);
                             updateInputs();
+                            updatePlantInputs();
+                            updateGlobals();
                             console.log("updateOutputs function:", updateOutputs);
                         } else {
                             console.log("Stopping intervals");
@@ -231,7 +406,7 @@
                             $.ajax({
                                 type: "POST",
                                 url: "/",
-                                data: { action: 'startSim', pyCode: $('#poST_code').val() },
+                                data: { action: 'startSim', pyCode: $('#poST_code').val()},
                                 success: function(response) {
                                     console.log("Server response:", response);
                                     setSimState(true); // Set sim flag to true
@@ -286,6 +461,8 @@
                             console.log("Loading inputs");
 
                             let inputs = {};
+                            let plant_inputs = {};
+                            let global_inputs = {};
 
                             // Collect inputs from the assetNameMenu list
                             $('#assetNameMenu input').each(function() {
@@ -304,12 +481,49 @@
                                 inputs[name] = value;
                             });
 
+                            // Collect inputs from the plant_assetNameMenu list
+                            $('#plant_assetNameMenu input').each(function() {
+                                let name = $(this).attr('name');
+                                let type = $(this).attr('type');
+                                let value;
+
+                                if (type === 'checkbox') {
+                                    value = $(this).is(':checked');
+                                } else if (type === 'number') {
+                                    value = parseFloat($(this).val());
+                                } else {
+                                    value = $(this).val();
+                                }
+
+                                plant_inputs[name] = value;
+                            });
+
+                            // Collect inputs from the globals_assetNameMenu list
+                            $('#globals_assetNameMenu input').each(function() {
+                                let name = $(this).attr('name');
+                                let type = $(this).attr('type');
+                                let value;
+
+                                if (type === 'checkbox') {
+                                    value = $(this).is(':checked');
+                                } else if (type === 'number') {
+                                    value = parseFloat($(this).val());
+                                } else {
+                                    value = $(this).val();
+                                }
+
+                                global_inputs[name] = value;
+                            });
+
                             console.log("Inputs JSON:", inputs);
+                            console.log("Plant inputs JSON:", plant_inputs);
 
                             // Form data payload
                             let formData = new FormData();
                             formData.append("action", "loadInputs");
                             formData.append("inputs", JSON.stringify(inputs));
+                            formData.append("plant_inputs", JSON.stringify(plant_inputs));
+                            formData.append("global_inputs", JSON.stringify(global_inputs));
 
                             $.ajax({
                                 type: "POST",
@@ -324,6 +538,9 @@
                                     console.error("Error loading inputs:", xhr.responseText);
                                 }
                             });
+                            updateInputs();
+                            updatePlantInputs();
+                            updateGlobals();
                         });
                     });
 

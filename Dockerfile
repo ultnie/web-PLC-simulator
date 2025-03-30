@@ -6,6 +6,7 @@ WORKDIR /app
 COPY webUI.py webUI.py
 COPY poST2py.jar poST2py.jar
 COPY translate.sh translate.sh
+COPY translate_plant.sh translate_plant.sh
 COPY startSim.sh startSim.sh
 COPY templates/index.html templates/index.html
 COPY static/ static/
