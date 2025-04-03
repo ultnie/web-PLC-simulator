@@ -54,131 +54,132 @@ def save_code(path, code, filename):
 
 def render_index(poST_code, plant_code, Py_code, plant_Py_code, out, plant_out, path, sim, pause):
     if sim:
-        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out,
+        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session = str(session['user']),
                                outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                                disable_start="disabled", sim=str(sim).lower(),
                                Pause="Pause simulation" if not pause else "Unpause simulation")
     if Py_code is not None:
-        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out,
+        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session = str(session['user']),
                                outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                                disable_inputs="disabled", disable_stop="disabled", disable_pause="disabled",
                                sim=str(sim).lower(), Pause="Pause simulation" if not pause else "Unpause simulation")
     if out is not None:
-        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out,
+        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session = str(session['user']),
                                outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                                disable_pause="disabled", disable_Py="disabled", disable_inputs="disabled",
                                disable_start="disabled", disable_stop="disabled", sim=str(sim).lower(),
                                Pause="Pause simulation" if not pause else "Unpause simulation")
     if poST_code is not None:
-        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out,
+        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session = str(session['user']),
                                outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                                disable_Py="disabled", disable_pause="disabled", disable_inputs="disabled",
                                disable_start="disabled", disable_stop="disabled", sim=str(sim).lower(),
                                Pause="Pause simulation" if not pause else "Unpause simulation")
 
-    return render_template("index.html", outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
+    return render_template("index.html", session = str(session['user']),  outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                            disable_poST="disabled", disable_Py="disabled", disable_pause="disabled",
                            disable_inputs="disabled", disable_start="disabled", disable_stop="disabled",
                            sim=str(sim).lower(), Pause="Pause simulation" if not pause else "Unpause simulation")
 
 
 #TODO: не используется, как и все функции с render_index кроме translate и openPoST, но возможно стоит поправить вызов render_index
-def startSim(user_path):
-    copytree("./sim", "./"+user_path+"sim")
-    shutil.copyfile(user_path + "poST_code.py", user_path+"sim/poST_code.py")
-    poST_code = request.form["poST_code"]
-    Py_code = None
-    if os.path.exists(user_path + "poST_code.py"):
-        Py_code = read_from_file(user_path + "poST_code.py")
-    out = read_from_file(user_path + "out")
-    plant_out = read_from_file(user_path + "plant_out")
-    open(user_path + "output_outputs", 'w').close()
-    open(user_path + "inputs", 'w').close()
-    open(user_path + "flags", 'w').close()
-    simulation_status[user_path] = True
-    pauses[user_path] = False
-    with open(user_path + 'flags', "w") as f:
-        f.write(simulation_status[user_path].__str__() + "\n" + pauses[user_path].__str__() + "\n")
-        f.close()
-    print(user_path)
-    subprocess.Popen(["./startSim.sh", user_path])
-    return render_index(poST_code, Py_code, out, plant_out, user_path, simulation_status[user_path], pauses[user_path])
 
-
-def run_program(clientSocket, user_path):
-    poST_code = request.form["poST_code"]
-    save_code(user_path, poST_code)
-    try:
-        clientSocket.connect(("localhost", 8081))
-        clientSocket.send((user_path + '\n').encode())
-        dataFromServer = clientSocket.recv(1024)
-    except Exception:
-        try:
-            clientSocket.close()
-            clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            clientSocket.connect(("localhost", 8081))
-        except Exception:
-            subprocess.run(["./translate.sh", str(session['user'])])
-    Py_code = None
-    if os.path.exists(user_path + "poST_code.py"):
-        Py_code = read_from_file(user_path + "poST_code.py")
-    out = read_from_file(user_path + "out")
-
-    copytree("./sim", "./" + user_path + "sim")
-    shutil.copyfile(user_path + "poST_code.py", user_path + "sim/poST_code.py")
-    poST_code = request.form["poST_code"]
-    Py_code = None
-    if os.path.exists(user_path + "poST_code.py"):
-        Py_code = read_from_file(user_path + "poST_code.py")
-    out = read_from_file(user_path + "out")
-    open(user_path + "output", 'w').close()
-    open(user_path + "inputs", 'w').close()
-    open(user_path + "flags", 'w').close()
-    simulation_status[user_path] = True
-    pauses[user_path] = False
-    with open(user_path + 'flags', "w") as f:
-        f.write(simulation_status[user_path].__str__() + "\n" + pauses[user_path].__str__() + "\n")
-        f.close()
-    print(user_path)
-    subprocess.Popen(["./startSim.sh", user_path])
-    return render_index(poST_code, Py_code, out, user_path, simulation_status[user_path], pauses[user_path])
-
-
-def stopSim(user_path):
-    poST_code = request.form["poST_code"]
-    Py_code = None
-    out = None
-    if os.path.exists(user_path + "poST_code.py"):
-        Py_code = read_from_file(user_path + "poST_code.py")
-    if os.path.exists(user_path + "out"):
-        out = read_from_file(user_path + "out")
-    simulation_status[user_path] = False
-    pauses[user_path] = False
-    with open(user_path + 'flags', "w") as f:
-        f.write(simulation_status[user_path].__str__() + "\n" + pauses[user_path].__str__() + "\n")
-        f.close()
-    open(user_path + "output_outputs", 'w').close()
-    open(user_path + "inputs", 'w').close()
-    open(user_path + "flags", 'w').close()
-    return render_index(poST_code, Py_code, out, user_path, simulation_status[user_path], pauses[user_path])
-
-
-def pauseSim(user_path):
-    poST_code = request.form["poST_code"]
-    Py_code = None
-    if os.path.exists(user_path + "poST_code.py"):
-        Py_code = read_from_file(user_path + "poST_code.py")
-    out = read_from_file(user_path + "out")
-    simulation_status[user_path] = True
-    with open(user_path + 'flags', "r") as f:
-        strs = f.read().splitlines()
-        f.close()
-        pauses[user_path] = (strs[1] == "True")
-        pauses[user_path] = not pauses[user_path]
-    with open(user_path + 'flags', "w") as f:
-        f.write(simulation_status[user_path].__str__() + "\n" + pauses[user_path].__str__() + "\n")
-        f.close()
-    return render_index(poST_code, Py_code, out, user_path, simulation_status[user_path], pauses[user_path])
+# def startSim(user_path):
+#     copytree("./sim", "./"+user_path+"sim")
+#     shutil.copyfile(user_path + "poST_code.py", user_path+"sim/poST_code.py")
+#     poST_code = request.form["poST_code"]
+#     Py_code = None
+#     if os.path.exists(user_path + "poST_code.py"):
+#         Py_code = read_from_file(user_path + "poST_code.py")
+#     out = read_from_file(user_path + "out")
+#     plant_out = read_from_file(user_path + "plant_out")
+#     open(user_path + "output_outputs", 'w').close()
+#     open(user_path + "inputs", 'w').close()
+#     open(user_path + "flags", 'w').close()
+#     simulation_status[user_path] = True
+#     pauses[user_path] = False
+#     with open(user_path + 'flags', "w") as f:
+#         f.write(simulation_status[user_path].__str__() + "\n" + pauses[user_path].__str__() + "\n")
+#         f.close()
+#     print(user_path)
+#     subprocess.Popen(["./startSim.sh", user_path])
+#     return render_index(poST_code, Py_code, out, plant_out, user_path, simulation_status[user_path], pauses[user_path])
+#
+#
+# def run_program(clientSocket, user_path):
+#     poST_code = request.form["poST_code"]
+#     save_code(user_path, poST_code)
+#     try:
+#         clientSocket.connect(("localhost", 8081))
+#         clientSocket.send((user_path + '\n').encode())
+#         dataFromServer = clientSocket.recv(1024)
+#     except Exception:
+#         try:
+#             clientSocket.close()
+#             clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#             clientSocket.connect(("localhost", 8081))
+#         except Exception:
+#             subprocess.run(["./translate.sh", str(session['user'])])
+#     Py_code = None
+#     if os.path.exists(user_path + "poST_code.py"):
+#         Py_code = read_from_file(user_path + "poST_code.py")
+#     out = read_from_file(user_path + "out")
+#
+#     copytree("./sim", "./" + user_path + "sim")
+#     shutil.copyfile(user_path + "poST_code.py", user_path + "sim/poST_code.py")
+#     poST_code = request.form["poST_code"]
+#     Py_code = None
+#     if os.path.exists(user_path + "poST_code.py"):
+#         Py_code = read_from_file(user_path + "poST_code.py")
+#     out = read_from_file(user_path + "out")
+#     open(user_path + "output", 'w').close()
+#     open(user_path + "inputs", 'w').close()
+#     open(user_path + "flags", 'w').close()
+#     simulation_status[user_path] = True
+#     pauses[user_path] = False
+#     with open(user_path + 'flags', "w") as f:
+#         f.write(simulation_status[user_path].__str__() + "\n" + pauses[user_path].__str__() + "\n")
+#         f.close()
+#     print(user_path)
+#     subprocess.Popen(["./startSim.sh", user_path])
+#     return render_index(poST_code, Py_code, out, user_path, simulation_status[user_path], pauses[user_path])
+#
+#
+# def stopSim(user_path):
+#     poST_code = request.form["poST_code"]
+#     Py_code = None
+#     out = None
+#     if os.path.exists(user_path + "poST_code.py"):
+#         Py_code = read_from_file(user_path + "poST_code.py")
+#     if os.path.exists(user_path + "out"):
+#         out = read_from_file(user_path + "out")
+#     simulation_status[user_path] = False
+#     pauses[user_path] = False
+#     with open(user_path + 'flags', "w") as f:
+#         f.write(simulation_status[user_path].__str__() + "\n" + pauses[user_path].__str__() + "\n")
+#         f.close()
+#     open(user_path + "output_outputs", 'w').close()
+#     open(user_path + "inputs", 'w').close()
+#     open(user_path + "flags", 'w').close()
+#     return render_index(poST_code, Py_code, out, user_path, simulation_status[user_path], pauses[user_path])
+#
+#
+# def pauseSim(user_path):
+#     poST_code = request.form["poST_code"]
+#     Py_code = None
+#     if os.path.exists(user_path + "poST_code.py"):
+#         Py_code = read_from_file(user_path + "poST_code.py")
+#     out = read_from_file(user_path + "out")
+#     simulation_status[user_path] = True
+#     with open(user_path + 'flags', "r") as f:
+#         strs = f.read().splitlines()
+#         f.close()
+#         pauses[user_path] = (strs[1] == "True")
+#         pauses[user_path] = not pauses[user_path]
+#     with open(user_path + 'flags', "w") as f:
+#         f.write(simulation_status[user_path].__str__() + "\n" + pauses[user_path].__str__() + "\n")
+#         f.close()
+#     return render_index(poST_code, Py_code, out, user_path, simulation_status[user_path], pauses[user_path])
 
 
 def startSimJSON(user_path):
@@ -348,21 +349,21 @@ def openPoST(user_path):
     return render_index(poST_code, "", "", "", "", "", user_path, False, False)
 
 
-def loadInputs(user_path):
-    with open(user_path + "sim_in", "w") as f:
-        f.write("\n".join(request.form.getlist('inputcheck')))
-        f.close()
-    poST_code = request.form["poST_code"]
-    Py_code = None
-    if os.path.exists(user_path + "poST_code.py"):
-        Py_code = read_from_file(user_path + "poST_code.py")
-    out = read_from_file(user_path + "out")
-    with open(user_path + "flags", "r") as f:
-        strs = f.read().splitlines()
-        f.close()
-        simulation_status[user_path] = (strs[0] == "True")
-        pauses[user_path] = (strs[1] == "True")
-    return render_index(poST_code, Py_code, out, user_path, simulation_status[user_path], pauses[user_path])
+# def loadInputs(user_path):
+#     with open(user_path + "sim_in", "w") as f:
+#         f.write("\n".join(request.form.getlist('inputcheck')))
+#         f.close()
+#     poST_code = request.form["poST_code"]
+#     Py_code = None
+#     if os.path.exists(user_path + "poST_code.py"):
+#         Py_code = read_from_file(user_path + "poST_code.py")
+#     out = read_from_file(user_path + "out")
+#     with open(user_path + "flags", "r") as f:
+#         strs = f.read().splitlines()
+#         f.close()
+#         simulation_status[user_path] = (strs[0] == "True")
+#         pauses[user_path] = (strs[1] == "True")
+#     return render_index(poST_code, Py_code, out, user_path, simulation_status[user_path], pauses[user_path])
 
 
 def loadInputsJSON(user_path):
@@ -438,14 +439,9 @@ def user_post_methods():
     elif request.form["action"] == "pauseSim":
         return pauseSimJSON(user_path)
 
-    elif request.form["action"] == "runProgram":
-        return run_program(clientSocket, user_path)
+    # elif request.form["action"] == "runProgram":
+    #     return run_program(clientSocket, user_path)
 
-    elif request.form["action"] == "stopProgram":
-        return stop_program(user_path)
-
-    elif request.form["action"] == "pauseProgram":
-        return pause_program(user_path)
     # TODO: loadInputs для plant
     elif request.form["action"] == "loadInputs":
         print("loading inputs")
