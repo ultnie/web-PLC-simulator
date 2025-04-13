@@ -322,8 +322,8 @@ def translate(clientSocket, user_path):
             clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             clientSocket.connect(("localhost", 8081))
         except Exception:
-            subprocess.run(["./translate.sh", str(session['user'])])
-            subprocess.run(["./translate_plant.sh", str(session['user'])])
+            subprocess.run(f"./translate.sh {str(session['user'])}", shell=True)
+            subprocess.run(f"./translate_plant.sh {str(session['user'])}", shell=True)
     Py_code = None
     plant_Py_code = None
     if os.path.exists(user_path + "poST_code.py"):
