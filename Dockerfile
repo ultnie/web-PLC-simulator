@@ -13,6 +13,9 @@ COPY static/ static/
 COPY sim/ sim/
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
+RUN ["chmod", "+x", "translate.sh"]
+RUN ["chmod", "+x", "translate_plant.sh"]
+RUN ["chmod", "+x", "startSim.sh"]
 EXPOSE 5000
 ENTRYPOINT ["python3"]
 CMD ["webUI.py"]

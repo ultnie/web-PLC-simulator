@@ -659,7 +659,4 @@ def get_plant_vars(session_id):
 
 
 if __name__ == "__main__":
-    subprocess.run(["chmod", "+x", "translate.sh"])
-    subprocess.run(["chmod", "+x", "translate_plant.sh"])
-    subprocess.run(["chmod", "+x", "startSim.sh"])
     app.run(host='0.0.0.0')
