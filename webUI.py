@@ -220,7 +220,7 @@ def startSimJSON(user_path):
         print(user_path)
 
         # Start subprocess and store it
-        simulation_process[user_path] = subprocess.Popen(["./startSim.sh", user_path])
+        simulation_process[user_path] = subprocess.Popen(f"./startSim.sh {user_path}", shell=True)
 
         return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
