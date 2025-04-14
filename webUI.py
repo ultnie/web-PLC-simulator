@@ -399,7 +399,7 @@ def user_post_methods():
     #     return run_program(clientSocket, user_path)
 
 
-@app.route('/sessions/<session_id>/update_inputs', methods=["POST"])
+@app.route('/sessions/<session_id>/load_inputs', methods=["POST"])
 def loadInputsJSON(session_id):
     user_path = "sessions/" + session_id
     try:
