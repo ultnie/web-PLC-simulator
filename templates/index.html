@@ -529,7 +529,7 @@
 
                             $.ajax({
                                 type: "POST",
-                                url: "/",                 // Same route for multiple actions
+                                url: "/sessions/{{session}}/update_inputs",                 // Same route for multiple actions
                                 processData: false,       // Don't convert to query string
                                 contentType: false,       // Let the browser set content type
                                 data: formData,           // Send as multipart/form-data

@@ -54,29 +54,29 @@ def save_code(path, code, filename):
 
 def render_index(poST_code, plant_code, Py_code, plant_Py_code, out, plant_out, path, sim, pause):
     if sim:
-        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session = str(session['user']),
+        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session=str(session['user']),
                                outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                                disable_start="disabled", sim=str(sim).lower(),
                                Pause="Pause simulation" if not pause else "Unpause simulation")
     if Py_code is not None:
-        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session = str(session['user']),
+        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session=str(session['user']),
                                outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                                disable_inputs="disabled", disable_stop="disabled", disable_pause="disabled",
                                sim=str(sim).lower(), Pause="Pause simulation" if not pause else "Unpause simulation")
     if out is not None:
-        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session = str(session['user']),
+        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session=str(session['user']),
                                outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                                disable_pause="disabled", disable_Py="disabled", disable_inputs="disabled",
                                disable_start="disabled", disable_stop="disabled", sim=str(sim).lower(),
                                Pause="Pause simulation" if not pause else "Unpause simulation")
     if poST_code is not None:
-        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session = str(session['user']),
+        return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session=str(session['user']),
                                outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                                disable_Py="disabled", disable_pause="disabled", disable_inputs="disabled",
                                disable_start="disabled", disable_stop="disabled", sim=str(sim).lower(),
                                Pause="Pause simulation" if not pause else "Unpause simulation")
 
-    return render_template("index.html", session = str(session['user']),  outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
+    return render_template("index.html", session=str(session['user']),  outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                            disable_poST="disabled", disable_Py="disabled", disable_pause="disabled",
                            disable_inputs="disabled", disable_start="disabled", disable_stop="disabled",
                            sim=str(sim).lower(), Pause="Pause simulation" if not pause else "Unpause simulation")
@@ -366,7 +366,42 @@ def openPoST(user_path):
 #     return render_index(poST_code, Py_code, out, user_path, simulation_status[user_path], pauses[user_path])
 
 
-def loadInputsJSON(user_path):
+@app.route('/', methods=["POST"])
+def user_post_methods():
+    clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    user_path = 'sessions/' + str(session['user']) + '/'
+
+    print(request, request.form['action'])
+
+    if request.form["action"] == "translate":
+        return translate(clientSocket, user_path)
+
+    #TODO: openPoST для plant
+    elif request.form["action"] == "openPoST" and 'file' in request.files:
+        return openPoST(user_path)
+    #TODO: downloadPoST для plant
+    elif request.form["action"] == "downloadPoST":
+        return send_file(user_path + "code.post", download_name='code.post', as_attachment=True)
+    #TODO: downloadPy для plant
+    elif request.form["action"] == "downloadPy":
+        return send_file(user_path + "poST_code.py", download_name='poST_code.py', as_attachment=True)
+
+    elif request.form["action"] == "startSim":
+        return startSimJSON(user_path)
+
+    elif request.form["action"] == "stopSim":
+        return stopSimJSON(user_path)
+
+    elif request.form["action"] == "pauseSim":
+        return pauseSimJSON(user_path)
+
+    # elif request.form["action"] == "runProgram":
+    #     return run_program(clientSocket, user_path)
+
+
+@app.route('/sessions/<session_id>/update_inputs', methods=["POST"])
+def loadInputsJSON(session_id):
+    user_path = "sessions/" + session_id
     try:
         # Debugging
         print(f"Content-Type: {request.content_type}")
@@ -408,44 +443,6 @@ def loadInputsJSON(user_path):
     except Exception as e:
         print(f"Error loading inputs: {e}")
         return jsonify(success=False, error=str(e)), 400
-
-
-@app.route('/', methods=["POST"])
-def user_post_methods():
-    clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    user_path = 'sessions/' + str(session['user']) + '/'
-
-    print(request, request.form['action'])
-
-    if request.form["action"] == "translate":
-        return translate(clientSocket, user_path)
-
-    #TODO: openPoST для plant
-    elif request.form["action"] == "openPoST" and 'file' in request.files:
-        return openPoST(user_path)
-    #TODO: downloadPoST для plant
-    elif request.form["action"] == "downloadPoST":
-        return send_file(user_path + "code.post", download_name='code.post', as_attachment=True)
-    #TODO: downloadPy для plant
-    elif request.form["action"] == "downloadPy":
-        return send_file(user_path + "poST_code.py", download_name='poST_code.py', as_attachment=True)
-
-    elif request.form["action"] == "startSim":
-        return startSimJSON(user_path)
-
-    elif request.form["action"] == "stopSim":
-        return stopSimJSON(user_path)
-
-    elif request.form["action"] == "pauseSim":
-        return pauseSimJSON(user_path)
-
-    # elif request.form["action"] == "runProgram":
-    #     return run_program(clientSocket, user_path)
-
-    # TODO: loadInputs для plant
-    elif request.form["action"] == "loadInputs":
-        print("loading inputs")
-        return loadInputsJSON(user_path)
 
 
 @app.route('/', methods=["GET"])
