@@ -485,7 +485,6 @@ def get_main():
     return render_index("", "", "", "", "", "", user_path, False, False)
 
 
-
 #TODO: get-методы для plant
 @app.route('/sessions/<session_id>/outputs', methods=["GET"])
 def get_outputs(session_id):

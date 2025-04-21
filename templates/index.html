@@ -203,15 +203,32 @@
                     let inputsLoaded = false;
                     let plant_inputsLoaded = false;
                     let globalsLoaded = false;
+                    let updateInputsTimeout = null;
+                    let updatePlantInputsTimeout = null;
+                    let updateGlobalsTimeout = null;
 
                     //TODO: update plant Inputs as well
                     function updateInputs() {
-                        if (inputsLoaded) return; // Stop if inputs are already loaded
+                        if (inputsLoaded || !sim) {
+                            if (updateInputsTimeout) {
+                                clearTimeout(updateInputsTimeout);
+                                updateInputsTimeout = null;
+                            }
+                            return; // Stop if inputs are already loaded
+                        }
+
+                        inputsLoaded = true;
 
                         $.get("{{inputs}}", function(data) {
                             console.log("Raw input data received:", data);
 
                             if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+
+                                if (updateInputsTimeout) {
+                                    clearTimeout(updateInputsTimeout);
+                                    updateInputsTimeout = null;
+                                }
+
                                 let assetList = $('#assetNameMenu');
                                 assetList.empty();
 
@@ -243,25 +260,40 @@
                                     li.appendTo(assetList);
                                 });
 
-                                inputsLoaded = true; // Mark as loaded only on non-empty response
                                 console.log("Inputs updated successfully");
                             } else {
                                 console.warn("Empty or invalid input data received — will retry");
-                                setTimeout(updateInputs, 1000); // Retry if empty JSON
+                                inputsLoaded = false;
+                                updateInputsTimeout = setTimeout(updateInputs, 1000);
                             }
                         }).fail(function(err) {
                             console.error("AJAX error fetching inputs:", err);
-                            setTimeout(updateInputs, 1000); // Retry if AJAX fails
+                            inputsLoaded = false;
+                            updateInputsTimeout = setTimeout(updateInputs, 1000);
                         });
                     }
 
                     function updatePlantInputs() {
-                        if (plant_inputsLoaded) return; // Stop if inputs are already loaded
+                        if (plant_inputsLoaded || !sim) {
+                            if (updatePlantInputsTimeout) {
+                                clearTimeout(updatePlantInputsTimeout);
+                                updatePlantInputsTimeout = null;
+                            }
+                            return; // Stop if inputs are already loaded
+                        }
+
+                        plant_inputsLoaded = true;
 
                         $.get("{{plant_inputs}}", function(data) {
                             console.log("Raw input data received:", data);
 
                             if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+
+                                if (updatePlantInputsTimeout) {
+                                    clearTimeout(updatePlantInputsTimeout);
+                                    updatePlantInputsTimeout = null;
+                                }
+
                                 let assetList = $('#plant_assetNameMenu');
                                 assetList.empty();
 
@@ -293,25 +325,41 @@
                                     li.appendTo(assetList);
                                 });
 
-                                plant_inputsLoaded = true; // Mark as loaded only on non-empty response
                                 console.log("Plant inputs updated successfully");
+
                             } else {
-                                console.warn("Empty or invalid input data received — will retry");
-                                setTimeout(updatePlantInputs, 1000); // Retry if empty JSON
+                                console.warn("Empty or invalid plant input data received — will retry");
+                                plant_inputsLoaded = false;
+                                updatePlantInputsTimeout = setTimeout(updatePlantInputs, 1000);
                             }
                         }).fail(function(err) {
-                            console.error("AJAX error fetching inputs:", err);
-                            setTimeout(updatePlantInputs, 1000); // Retry if AJAX fails
+                            console.error("AJAX error fetching plant inputs:", err);
+                            plant_inputsLoaded = false;
+                            updatePlantInputsTimeout = setTimeout(updatePlantInputs, 1000);
                         });
                     }
 
                     function updateGlobals() {
-                        if (globalsLoaded) return; // Stop if inputs are already loaded
+                        if (globalsLoaded || !sim) {
+                            if (updateGlobalsTimeout) {
+                                clearTimeout(updateGlobalsTimeout);
+                                updateGlobalsTimeout = null;
+                            }
+                            return; // Stop if inputs are already loaded
+                        }
+
+                        globalsLoaded = true;
 
                         $.get("{{globals}}", function(data) {
                             console.log("Raw input data received:", data);
 
                             if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+
+                                if (updateGlobalsTimeout) {
+                                    clearTimeout(updateGlobalsTimeout);
+                                    updateGlobalsTimeout = null;
+                                }
+
                                 let assetList = $('#globals_assetNameMenu');
                                 assetList.empty();
 
@@ -343,15 +391,17 @@
                                     li.appendTo(assetList);
                                 });
 
-                                plant_inputsLoaded = true; // Mark as loaded only on non-empty response
                                 console.log("Globals updated successfully");
+
                             } else {
-                                console.warn("Empty or invalid input data received — will retry");
-                                setTimeout(updateGlobals, 1000); // Retry if empty JSON
+                                console.warn("Empty or invalid globals data received — will retry");
+                                globalsLoaded = false;
+                                updateGlobalsTimeout = setTimeout(updateGlobals, 1000);
                             }
                         }).fail(function(err) {
-                            console.error("AJAX error fetching inputs:", err);
-                            setTimeout(updateGlobals, 1000); // Retry if AJAX fails
+                            console.error("AJAX error fetching globals:", err);
+                            globalsLoaded = false;
+                            updateGlobalsTimeout = setTimeout(updateGlobals, 1000);
                         });
                     }
 
@@ -363,6 +413,9 @@
                         $("input[name='sim']").val(sim);
                         if (sim) {
                             console.log("Forcing start of intervals"); // Debugging line
+                            if (outputsInterval) {
+                                clearInterval(outputsInterval);
+                            }
                             outputsInterval = setInterval(function() {
                                 console.log("updateOutputs interval running");
                                 updateOutputs();
@@ -374,6 +427,7 @@
                         } else {
                             console.log("Stopping intervals");
                             clearInterval(outputsInterval);
+                            outputsInterval = null;
                         }
                     }
 
