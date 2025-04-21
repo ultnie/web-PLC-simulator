@@ -209,13 +209,7 @@
 
                     //TODO: update plant Inputs as well
                     function updateInputs() {
-                        if (inputsLoaded || !sim) {
-                            if (updateInputsTimeout) {
-                                clearTimeout(updateInputsTimeout);
-                                updateInputsTimeout = null;
-                            }
-                            return; // Stop if inputs are already loaded
-                        }
+                        if (inputsLoaded) return; // Stop if inputs are already loaded
 
                         inputsLoaded = true;
 
@@ -274,13 +268,7 @@
                     }
 
                     function updatePlantInputs() {
-                        if (plant_inputsLoaded || !sim) {
-                            if (updatePlantInputsTimeout) {
-                                clearTimeout(updatePlantInputsTimeout);
-                                updatePlantInputsTimeout = null;
-                            }
-                            return; // Stop if inputs are already loaded
-                        }
+                        if (plant_inputsLoaded) return;
 
                         plant_inputsLoaded = true;
 
@@ -340,13 +328,7 @@
                     }
 
                     function updateGlobals() {
-                        if (globalsLoaded || !sim) {
-                            if (updateGlobalsTimeout) {
-                                clearTimeout(updateGlobalsTimeout);
-                                updateGlobalsTimeout = null;
-                            }
-                            return; // Stop if inputs are already loaded
-                        }
+                        if (globalsLoaded) return;
 
                         globalsLoaded = true;
 
