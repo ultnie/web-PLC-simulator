@@ -227,6 +227,11 @@
                                 assetList.empty();
 
                                 $.each(data, function(key, value) {
+                                    // Skip if value is an array
+                                    if (Array.isArray(value)) {
+                                        return;
+                                    }
+
                                     let li = $('<li/>').addClass('ui-menu-item').attr('role', 'menuitem');
 
                                     let input;
@@ -286,6 +291,11 @@
                                 assetList.empty();
 
                                 $.each(data, function(key, value) {
+                                    // Skip if value is an array
+                                    if (Array.isArray(value)) {
+                                        return;
+                                    }
+
                                     let li = $('<li/>').addClass('ui-menu-item').attr('role', 'menuitem');
 
                                     let input;
@@ -346,6 +356,11 @@
                                 assetList.empty();
 
                                 $.each(data, function(key, value) {
+                                    // Skip if value is an array
+                                    if (Array.isArray(value)) {
+                                        return;
+                                    }
+
                                     let li = $('<li/>').addClass('ui-menu-item').attr('role', 'menuitem');
 
                                     let input;
