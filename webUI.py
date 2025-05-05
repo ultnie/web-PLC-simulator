@@ -336,6 +336,10 @@ def user_post_methods():
     elif request.form["action"] == "startSim":
         return startSimJSON(user_path)
 
+    # TODO: сделать кнопку на интерфейсе
+    elif request.form["action"] == "stepSim":
+        return stepOnceJSON(user_path)
+
     elif request.form["action"] == "stopSim":
         return stopSimJSON(user_path)
 
