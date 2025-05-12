@@ -23,13 +23,13 @@ FILE_MAP = {
     "states": "states",
     "inputs": "inputs",
     "times": "times",
-    "globvars": "glob_vars",
+    "globvars": "global_vars",
     "vars": "vars",
     "plant_outputs": "plant_all",
     "plant_states": "plant_states",
     "plant_inputs": "plant_inputs",
     "plant_times": "plant_times",
-    "plant_globvars": "plant_glob_vars",
+    "plant_globvars": "plant_global_vars",
     "plant_vars": "plant_vars"
 }
 
@@ -304,13 +304,32 @@ def translate(clientSocket, user_path):
     return render_index(poST_code, plant_code, Py_code, plant_Py_code, out, plant_out, user_path, False, False)
 
 
-# TODO: openPoST для plant
 def openPoST(user_path):
     stopSimJSON(user_path)
-    input_file = request.files["file"]
-    poST_code = input_file.read(4 * 1024 * 1024 + 1).decode("utf-8")
+    print(request.files)
+    if "file" in request.files:
+        controller_file = request.files["file"]
+        poST_code = controller_file.read().decode("utf-8")
+    else:
+        poST_code = ""
     save_code(user_path, poST_code, "code.post")
-    return render_index(poST_code, "", "", "", "", "", user_path, False, False)
+
+    if "file_plant" in request.files:
+        plant_file = request.files["file_plant"]
+        plant_poST_code = plant_file.read().decode("utf-8")
+    else:
+        plant_poST_code = ""
+    save_code(user_path, plant_poST_code, "plant_code.post")
+
+    if os.path.exists(user_path + "poST_code.py"):
+        Py_code = read_from_file(user_path + "poST_code.py")
+    else:
+        Py_code = ""
+    if os.path.exists(user_path + "plant_code.py"):
+        plant_Py_code = read_from_file(user_path + "plant_code.py")
+    else:
+        plant_Py_code = ""
+    return render_index(poST_code, plant_poST_code, Py_code, plant_Py_code, "", "", user_path, False, False)
 
 
 @app.route('/', methods=["POST"])
@@ -323,20 +342,22 @@ def user_post_methods():
     if request.form["action"] == "translate":
         return translate(clientSocket, user_path)
 
-    # TODO: openPoST для plant
-    elif request.form["action"] == "openPoST" and 'file' in request.files:
+    elif request.form["action"] == "openPoST":
         return openPoST(user_path)
-    # TODO: downloadPoST для plant
+
     elif request.form["action"] == "downloadPoST":
-        return send_file(user_path + "code.post", download_name='code.post', as_attachment=True)
-    # TODO: downloadPy для plant
+        return send_file(user_path + "code.post", download_name='controller_code.post', as_attachment=True)
+    elif request.form["action"] == "downloadPoST_plant":
+        return send_file(user_path + "plant_code.post", download_name='plant_code.post', as_attachment=True)
+
     elif request.form["action"] == "downloadPy":
-        return send_file(user_path + "poST_code.py", download_name='poST_code.py', as_attachment=True)
+        return send_file(user_path + "poST_code.py", download_name='controller_code.py', as_attachment=True)
+    elif request.form["action"] == "downloadPy_plant":
+        return send_file(user_path + "plant_code.py", download_name='plant_code.py', as_attachment=True)
 
     elif request.form["action"] == "startSim":
         return startSimJSON(user_path)
 
-    # TODO: сделать кнопку на интерфейсе
     elif request.form["action"] == "stepSim":
         return stepOnceJSON(user_path)
 

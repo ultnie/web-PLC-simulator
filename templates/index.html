@@ -3,7 +3,7 @@
 <head>
     <title>PLC Simulator</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=1080px, shrink-to-fit=yes">
+    <meta name="viewport" content="width=100vh, shrink-to-fit=yes">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -11,93 +11,99 @@
 </head>
     <body>
     <div>session_id: {{session}}</div>
-    <form method="POST" action="/" enctype="multipart/form-data" style="height: 95vh; margin-bottom: 20px;">
-        <div class="row" style="height: 65%; margin-bottom: 20px;">
-            <div class="col-6" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
-              <ul class="nav nav-tabs" id="textTabs" role="tablist" style="margin-bottom: 10px;">
-                <li class="nav-item"><a class="nav-link active" id="post-tab" data-toggle="tab" href="#post" role="tab">poST Code</a></li>
+    <form method="POST" action="/" enctype="multipart/form-data" style="height: 90vh;">
+        <div class="row" style="height: 60vh; margin-bottom: 1%; min-height: 200px; overflow-y:auto;">
+            <div class="col-6" style="display: flex; flex-direction: column; height: 60vh; overflow: hidden;">
+              <ul class="nav nav-tabs" id="textTabs" role="tablist">
+                <li class="nav-item"><a class="nav-link active" id="post-tab" data-toggle="tab" href="#post" role="tab">Controller poST Code</a></li>
                 <li class="nav-item"><a class="nav-link" id="plant-post-tab" data-toggle="tab" href="#plant-post" role="tab">Plant poST Code</a></li>
-                <li class="nav-item"><a class="nav-link" id="py-tab" data-toggle="tab" href="#py" role="tab">Py Code</a></li>
+                <li class="nav-item"><a class="nav-link" id="py-tab" data-toggle="tab" href="#py" role="tab">Controller Py Code</a></li>
                 <li class="nav-item"><a class="nav-link" id="plant-py-tab" data-toggle="tab" href="#plant-py" role="tab">Plant Py Code</a></li>
               </ul>
 
-              <div class="tab-content" id="textTabsContent" style="flex: 1; overflow-y: hidden;"> <!-- Prevent overflow on the tab-content -->
+              <div class="tab-content" id="textTabsContent" style="flex: 1; overflow-y: auto;">
                 <!-- poST Code -->
-                <div class="tab-pane fade show active" id="post" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
-                  <div class="editor-container" style="height: 100%; overflow: hidden;"> <!-- Remove overflow here -->
+                <div class="tab-pane fade show active" id="post" role="tabpanel" style="height: 100%;">
+                  <div class="editor-container" style="height: 89%; min-height:200px; overflow: hidden;">
                     <div class="line-numbers" id="ln-post">1</div>
                     <textarea id="poST_code" name="poST_code" placeholder="poST code"
                               onscroll="syncScroll('poST_code', 'ln-post')" oninput="updateLineNumbers('poST_code', 'ln-post')"
                               style="flex: 1; resize: none; overflow-y: auto; margin-bottom: 10px; height: 100%;">{{poST_code}}</textarea>
                   </div>
+                        <button type="submit" class="btn btn-light" name="action" value="downloadPoST" style="margin-top: 1%; min-height:14px; max-height: 40px; width: 100%">Download</button>
                 </div>
 
                 <!-- Plant poST Code -->
-                <div class="tab-pane fade" id="plant-post" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
-                  <div class="editor-container" style="height: 100%; overflow: hidden;"> <!-- Remove overflow here -->
+                <div class="tab-pane fade" id="plant-post" role="tabpanel" style="height: 100%;">
+                  <div class="editor-container" style="height: 89%; min-height:200px; overflow: hidden;">
                     <div class="line-numbers" id="ln-plant-post">1</div>
                     <textarea id="plant_poST_code" name="plant_poST_code" placeholder="plant poST code"
                               onscroll="syncScroll('plant_poST_code', 'ln-plant-post')" oninput="updateLineNumbers('plant_poST_code', 'ln-plant-post')"
                               style="flex: 1; resize: none; overflow-y: auto; margin-bottom: 10px; height: 100%;">{{plant_poST_code}}</textarea>
                   </div>
+                    <button type="submit" class="btn btn-light" name="action" value="downloadPoST_plant" style="margin-top:1%; min-height:14px; max-height: 40px; width: 100%">Download</button>
                 </div>
 
                 <!-- Py Code -->
-                <div class="tab-pane fade" id="py" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
-                  <div class="editor-container" style="height: 100%; overflow: hidden;"> <!-- Remove overflow here -->
+                <div class="tab-pane fade" id="py" role="tabpanel" style="height: 100%;">
+                  <div class="editor-container" style="height: 89%; min-height:200px; overflow: hidden;">
                     <div class="line-numbers" id="ln-py">1</div>
                     <textarea id="Py_code" name="Py_code" placeholder="Py code" readonly
                               onscroll="syncScroll('Py_code', 'ln-py')" oninput="updateLineNumbers('Py_code', 'ln-py')"
                               style="flex: 1; resize: none; overflow-y: auto; margin-bottom: 10px; height: 100%;">{{Py_code}}</textarea>
                   </div>
+                    <button type="submit" class="btn btn-light" name="action" value="downloadPy" style="margin-top: 1%; min-height: 14px; max-height: 40px; width: 100%">Download</button>
                 </div>
 
                 <!-- Plant Py Code -->
-                <div class="tab-pane fade" id="plant-py" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
-                  <div class="editor-container" style="height: 100%; overflow: hidden;"> <!-- Remove overflow here -->
+                <div class="tab-pane fade" id="plant-py" role="tabpanel" style="height: 100%;">
+                  <div class="editor-container" style="height: 89%; min-height:200px; overflow: hidden;">
                     <div class="line-numbers" id="ln-plant-py">1</div>
                     <textarea id="plant_Py_code" name="Py_code" placeholder="Plant Py code" readonly
                               onscroll="syncScroll('plant_Py_code', 'ln-plant-py')" oninput="updateLineNumbers('plant_Py_code', 'ln-plant-py')"
                               style="flex: 1; resize: none; overflow-y: auto; margin-bottom: 10px; height: 100%;">{{plant_Py_code}}</textarea>
                   </div>
+                    <button type="submit" class="btn btn-light" name="action" value="downloadPy_plant" style="margin-top: 1%; min-height: 14px; max-height: 40px; width: 100%">Download</button>
                 </div>
               </div>
             </div>
 
-            <div class="col-3" style="height:90%; resize:none; margin-bottom: 10px;">
+            <div class="col-3" style="display: flex; flex-direction: column; height: 100%; overflow: auto; min-height: 200px">
+                <div>Inputs: </div>
                 <ul class="nav nav-tabs" id="inputTabs" role="tablist">
-                    <li class="nav-item"><a class="nav-link active" id="post-input-tab" data-toggle="tab" href="#post-input" role="tab">poST Inputs</a></li>
-                    <li class="nav-item"><a class="nav-link" id="plant-input-tab" data-toggle="tab" href="#plant-input" role="tab">Plant Inputs</a></li>
-                    <li class="nav-item"><a class="nav-link" id="globals-input-tab" data-toggle="tab" href="#globals-input" role="tab">Global Inputs</a></li>
+                    <li class="nav-item"><a class="nav-link active" id="post-input-tab" data-toggle="tab" href="#post-input" role="tab">Controller</a></li>
+                    <li class="nav-item"><a class="nav-link" id="plant-input-tab" data-toggle="tab" href="#plant-input" role="tab">Plant</a></li>
+                    <li class="nav-item"><a class="nav-link" id="globals-input-tab" data-toggle="tab" href="#globals-input" role="tab">Global</a></li>
                 </ul>
                 <div class="tab-content" id="inputTabsContent" style="height: 100%; max-height: 100%; overflow: scroll;">
-                    <div class="tab-pane fade show active" id="post-input" role="tabpanel" style="height: 100%;">
-                            <ul class="list-group border" id="assetNameMenu" style="width:100%; height:100%;">
+                    <div class="tab-pane fade show active" id="post-input" role="tabpanel" style="height: 100%; overflow-y:auto;">
+                            <ul class="list-group border" id="assetNameMenu" style="width:100%; height:100%; min-height:200px;">
                             </ul>
                     </div>
 
-                    <div class="tab-pane fade" id="plant-input" role="tabpanel" style="height: 100%;">
-                            <ul class="list-group border" id="plant_assetNameMenu" style="width:100%; height:100%;">
+                    <div class="tab-pane fade" id="plant-input" role="tabpanel" style="height: 100%; overflow-y:auto;">
+                            <ul class="list-group border" id="plant_assetNameMenu" style="width:100%; height:100%; min-height:200px;">
                             </ul>
                     </div>
 
-                    <div class="tab-pane fade" id="globals-input" role="tabpanel" style="height: 100%;">
-                        <ul class="list-group border" id="globals_assetNameMenu" style="width:100%; height:100%;"></ul>
+                    <div class="tab-pane fade" id="globals-input" role="tabpanel" style="height: 100%; overflow-y:auto;">
+                        <ul class="list-group border" id="globals_assetNameMenu" style="width:100%; height:100%; min-height:200px;"></ul>
                     </div>
                 </div>
+                <button type="button" class="btn btn-light" id="loadInputsButton" style="max-height: 40px; margin-top: 1%; min-height: 14px">Load Inputs</button>
             </div>
 
-            <div class="col-3" style="display: flex; flex-direction: column;">
-                <ul class="nav nav-tabs" id="outputTabs" role="tablist" style="margin-bottom: 10px;">
-                    <li class="nav-item"><a class="nav-link active" id="post-output-tab" data-toggle="tab" href="#post-output" role="tab">poST Outputs</a></li>
+            <div class="col-3" style="display: flex; flex-direction: column; min-height:200px;">
+                <ul class="nav nav-tabs" id="outputTabs" role="tablist">
+                    <li class="nav-item"><a class="nav-link active" id="post-output-tab" data-toggle="tab" href="#post-output" role="tab">Controller Outputs</a></li>
                     <li class="nav-item"><a class="nav-link" id="plant-output-tab" data-toggle="tab" href="#plant-output" role="tab">Plant Outputs</a></li>
                 </ul>
                 <div class="tab-content" id="outputTabsContent" style="flex: 1;">
-                    <div class="tab-pane fade show active" id="post-output" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
+                    <div class="tab-pane fade show active" id="post-output" role="tabpanel" style="height: 100%; margin-bottom: 10px; overflow-y:auto;">
                         <textarea type="text" id="outputs" name="outputs" placeholder="Outputs" readonly
                             style="width:100%; height:100%; resize: none; margin-bottom: 10px;"></textarea>
                     </div>
-                    <div class="tab-pane fade" id="plant-output" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
+                    <div class="tab-pane fade" id="plant-output" role="tabpanel" style="height: 100%; margin-bottom: 10px; overflow-y:auto;">
                         <textarea type="text" id="plant_outputs" name="plant_outputs" placeholder="Plant Outputs" readonly
                             style="width:100%; height:100%; resize: none; margin-bottom: 10px;"></textarea>
                     </div>
@@ -105,39 +111,36 @@
             </div>
         </div>
 
-        <div class="row" style="height: 30%;">
+        <div class="row" style="height: 25vh;">
             <div class="col-6" style="display: flex; flex-direction: column;">
-                <ul class="nav nav-tabs" id="errorTabs" role="tablist" style="margin-bottom: 10px;">
-                    <li class="nav-item"><a class="nav-link active" id="post-error-tab" data-toggle="tab" href="#post-error" role="tab">poST Outputs</a></li>
-                    <li class="nav-item"><a class="nav-link" id="plant-error-tab" data-toggle="tab" href="#plant-error" role="tab">Plant Outputs</a></li>
+                <ul class="nav nav-tabs" id="errorTabs" role="tablist">
+                    <li class="nav-item"><a class="nav-link active" id="post-error-tab" data-toggle="tab" href="#post-error" role="tab">Controller Translator Outputs</a></li>
+                    <li class="nav-item"><a class="nav-link" id="plant-error-tab" data-toggle="tab" href="#plant-error" role="tab">Plant Translator Outputs</a></li>
                 </ul>
-                <div class="tab-content" id="errorTabsContent" style="flex: 1;">
+                <div class="tab-content" id="errorTabsContent" style="flex: 1; margin-bottom: 10px;">
                     <div class="tab-pane fade show active" id="post-error" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
-                        <textarea type="text" name="out" placeholder="PoST Errors" readonly style="width:100%; height:100%; resize: none; margin-bottom: 10px;">{{out}}</textarea>
+                        <textarea type="text" name="out" placeholder="PoST Errors" readonly style="width:100%; height:100%; resize: none;">{{out}}</textarea>
                     </div>
                     <div class="tab-pane fade" id="plant-error" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
-                        <textarea type="text" name="plant_out" placeholder="Plant Errors" readonly style="width:100%; height:100%; resize: none; margin-bottom: 10px;">{{plant_out}}</textarea>
+                        <textarea type="text" name="plant_out" placeholder="Plant Errors" readonly style="width:100%; height:100%; resize: none;">{{plant_out}}</textarea>
                     </div>
                 </div>
             </div>
             <div class="col">
-                <label style="margin-bottom: 10px;">Open poST code:</label>
+                <label style="margin-bottom: 10px;">Open poST Controller code:</label>
                 <input type="file" name="file" style="padding-bottom: 1px; margin-bottom: 20px;">
+                <label style="margin-bottom: 10px;">Open poST Plant code:</label>
+                <input type="file" name="file_plant" style="padding-bottom: 1px; margin-bottom: 20px;">
                 <button type="submit" class="btn btn-light" name="action" value="openPoST" style="margin-bottom: 20px; height: 50px;">Open</button>
             </div>
             <div class="col">
-                <button type="submit" id="translateButton" class="btn btn-light" name="action" value="translate" style="margin-bottom: 20px; height: 50px;">Translate</button>
+                <button type="submit" id="translateButton" class="btn btn-light" name="action" value="translate" style="margin-bottom: 10px; height: 40px;">Translate</button>
             </div>
             <div class="col">
-                <button type="submit" class="btn btn-light" name="action" value="downloadPoST" style="margin-bottom: 20px; height: 50px;">Download poST Code</button>
-                <button type="submit" class="btn btn-light" name="action" value="downloadPy" style="margin-bottom: 20px; height: 50px;">Download Py Code</button>
-                <button type="button" id="loadInputsButton" style="margin-bottom: 20px; height: 50px;">Load Inputs</button>
-            </div>
-            <div class="col">
-                <button type="submit" id="startSimButton" class="btn btn-light" name="action" value="startSim" style="margin-bottom: 20px; height: 50px;">Start Simulation</button>
-                <button type="submit" id="stopSimButton" class="btn btn-light" name="action" value="stopSim" style="margin-bottom: 20px; height: 50px;">Stop Simulation</button>
-                <button type="submit" id="pauseSimButton" class="btn btn-light" name="action" value="pauseSim" style="margin-bottom: 20px; height: 50px;">Pause Simulation</button>
-                <button type="submit" id="stepSimButton" class="btn btn-light" name="action" value="stepSim" style="margin-bottom: 20px; height: 50px;">Do One Cycle</button>
+                <button type="submit" id="startSimButton" class="btn btn-light" name="action" value="startSim" style="margin-bottom: 10px; height: 40px;">Start</button>
+                <button type="submit" id="stopSimButton" class="btn btn-light" name="action" value="stopSim" style="margin-bottom: 10px; height: 40px;">Stop</button>
+                <button type="submit" id="pauseSimButton" class="btn btn-light" name="action" value="pauseSim" style="margin-bottom: 10px; height: 40px;">Pause/Unpause</button>
+                <button type="submit" id="stepSimButton" class="btn btn-light" name="action" value="stepSim" style="margin-bottom: 10px; height: 40px;">One Cycle</button>
             </div>
         </div>
     </form>
