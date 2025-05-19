@@ -10,7 +10,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 </head>
     <body>
-    <div>session_id: {{session}}</div>
     <form method="POST" action="/" enctype="multipart/form-data" style="height: 90vh;">
         <div class="row" style="height: 60vh; margin-bottom: 1%; min-height: 200px;">
             <div class="col-6" style="display: flex; flex-direction: column; height: 60vh; overflow: hidden; min-height: 200px">
@@ -132,13 +131,31 @@
                 <button type="submit" class="btn btn-light" name="action" value="openPoST" style="margin-bottom: 20px; height: 50px;">Open</button>
             </div>
             <div class="col">
-                <button type="submit" id="translateButton" class="btn btn-light" name="action" value="translate" style="margin-bottom: 10px; height: 40px;">Translate</button>
+                <button type="submit" id="translateButton" class="btn btn-light" name="action" value="translate" style="margin-bottom: 10px; height: 40px; width: 100%">Translate</button>
+                <div>Visualization:</div>
+                <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{editor}}?session={{session}}', 'editorPopupWindow', 'location=yes, resizable=yes, scrollbars=yes, fullscreen=yes'); return false;">
+                    Editor
+                </a>
+                <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{editor}}?session={{session}}', 'editorTab'); return false;">
+                    Editor
+                </a>
+                <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{viewer}}?session={{session}}', 'viewerPopupWindow', 'location=yes, resizable=yes, scrollbars=yes, fullscreen=yes'); return false;">
+                    Viewer
+                </a>
+                <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{viewer}}?session={{session}}', 'viewerTab'); return false;">
+                    Viewer
+                </a>
             </div>
             <div class="col">
                 <button type="submit" id="startSimButton" class="btn btn-light" name="action" value="startSim" style="margin-bottom: 10px; height: 40px;">Start</button>
                 <button type="submit" id="stopSimButton" class="btn btn-light" name="action" value="stopSim" style="margin-bottom: 10px; height: 40px;">Stop</button>
                 <button type="submit" id="pauseSimButton" class="btn btn-light" name="action" value="pauseSim" style="margin-bottom: 10px; height: 40px;">Pause/Unpause</button>
                 <button type="submit" id="stepSimButton" class="btn btn-light" name="action" value="stepSim" style="margin-bottom: 10px; height: 40px;">One Cycle</button>
+                <div>Time Scale: </div>
+                <div class="row" style="margin: 0px;">
+                        <input type="number" id="time" name="timeValue" class="form-control" placeholder="1.0" style="margin-bottom: 10px; margin-right: 5%; height: 40px; min-width: 63px; width: 55%">
+                        <button type="submit" id="changeTimeButton" class="btn btn-light" name="action" value="changeTime" style="margin-bottom: 10px; height: 40px; min-width: 63px; width: 40%;">Set</button>
+                </div>
             </div>
         </div>
     </form>
@@ -181,7 +198,6 @@
         <script>
             let sim = {{sim}} || false;
 
-            //TODO: update plant Outputs as well
             function updateOutputs() {
                 $.get("{{outputs}}")
                     .done(function(data) {
@@ -490,6 +506,7 @@
                 $('#pauseSimButton').prop('disabled', !sim);                  // Pause only active when sim is running
                 $('#stopSimButton').prop('disabled', !sim);                   // Stop only active when sim is running
                 $('#loadInputsButton').prop('disabled', !sim);                // Load Inputs only enabled when sim is running
+                $('#changeTimeButton').prop('disabled', !sim);
 
                 // Simplified functionality: run setSimState with current sim value
                 setSimState(sim);
@@ -501,6 +518,28 @@
                 // Watch for changes in PyCode text field
                 $('#poST_code').on('input', function() {
                     updateButtonStates();
+                });
+
+                $('#changeTimeButton').click(function(e) {
+                    e.preventDefault();
+                    const timeValue = $('#time').val();
+
+                    console.log("Changing simulation time scale to:", timeValue);
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/", // Adjust this if your endpoint is different
+                        data: {
+                            action: 'changeTime',
+                            timeValue: timeValue,
+                        },
+                        success: function(response) {
+                            console.log("Server response:", response);
+                        },
+                        error: function(err) {
+                            console.error("Error changing simulation time:", err);
+                        }
+                    });
                 });
 
                 $('#startSimButton').click(function(e) {

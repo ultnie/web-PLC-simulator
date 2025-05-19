@@ -6,32 +6,20 @@ import socket
 import subprocess
 import uuid
 import psutil
+import visualization_ports
+import api_file_map
 
 from flask import Flask, render_template, session, request, send_file, Response, jsonify, abort
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.secret_key = 'web-poST Simulator'.encode()
+CORS(app)
 
 # Store the simulation process globally
 simulation_process = {}
 simulation_status = {}
 pauses = {}
-
-
-FILE_MAP = {
-    "outputs": "all",
-    "states": "states",
-    "inputs": "inputs",
-    "times": "times",
-    "globvars": "global_vars",
-    "vars": "vars",
-    "plant_outputs": "plant_all",
-    "plant_states": "plant_states",
-    "plant_inputs": "plant_inputs",
-    "plant_times": "plant_times",
-    "plant_globvars": "plant_global_vars",
-    "plant_vars": "plant_vars"
-}
 
 
 def copytree(src, dst, symlinks=False, ignore=None):
@@ -73,29 +61,29 @@ def render_index(poST_code, plant_code, Py_code, plant_Py_code, out, plant_out, 
         return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session=str(session['user']),
                                outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                                disable_start="disabled", sim=str(sim).lower(),
-                               Pause="Pause simulation" if not pause else "Unpause simulation")
+                               Pause="Pause simulation" if not pause else "Unpause simulation", editor=visualization_ports.editor_port, viewer=visualization_ports.viewer_port)
     if Py_code is not None:
         return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session=str(session['user']),
                                outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                                disable_inputs="disabled", disable_stop="disabled", disable_pause="disabled",
-                               sim=str(sim).lower(), Pause="Pause simulation" if not pause else "Unpause simulation")
+                               sim=str(sim).lower(), Pause="Pause simulation" if not pause else "Unpause simulation", editor=visualization_ports.editor_port, viewer=visualization_ports.viewer_port)
     if out is not None:
         return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session=str(session['user']),
                                outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                                disable_pause="disabled", disable_Py="disabled", disable_inputs="disabled",
                                disable_start="disabled", disable_stop="disabled", sim=str(sim).lower(),
-                               Pause="Pause simulation" if not pause else "Unpause simulation")
+                               Pause="Pause simulation" if not pause else "Unpause simulation", editor=visualization_ports.editor_port, viewer=visualization_ports.viewer_port)
     if poST_code is not None:
         return render_template("index.html", poST_code=poST_code, plant_poST_code=plant_code, Py_code=Py_code, plant_Py_code=plant_Py_code, out=out, plant_out=plant_out, session=str(session['user']),
                                outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                                disable_Py="disabled", disable_pause="disabled", disable_inputs="disabled",
                                disable_start="disabled", disable_stop="disabled", sim=str(sim).lower(),
-                               Pause="Pause simulation" if not pause else "Unpause simulation")
+                               Pause="Pause simulation" if not pause else "Unpause simulation", editor=visualization_ports.editor_port, viewer=visualization_ports.viewer_port)
 
     return render_template("index.html", session=str(session['user']),  outputs=path + "outputs", plant_outputs=path+"plant_outputs", inputs=path + "inputs", plant_inputs=path+"plant_inputs", globals = path + "globvars",
                            disable_poST="disabled", disable_Py="disabled", disable_pause="disabled",
                            disable_inputs="disabled", disable_start="disabled", disable_stop="disabled",
-                           sim=str(sim).lower(), Pause="Pause simulation" if not pause else "Unpause simulation")
+                           sim=str(sim).lower(), Pause="Pause simulation" if not pause else "Unpause simulation", editor=visualization_ports.editor_port, viewer=visualization_ports.viewer_port)
 
 
 def startSimJSON(user_path):
@@ -227,12 +215,10 @@ def stepOnceJSON(user_path):
         sim_path = os.path.join(user_path, "sim")
         flags_path = os.path.join(user_path, "flags")
 
-        # Initialize sim directory and contents if needed
         if not os.path.exists(sim_path):
             os.makedirs(sim_path)
             copytree("./sim", sim_path)
 
-            # Copy user-specific poST and plant code
             poST_src = os.path.join(user_path, "poST_code.py")
             plant_src = os.path.join(user_path, "plant_code.py")
 
@@ -246,11 +232,10 @@ def stepOnceJSON(user_path):
 
             print("Simulation directory initialized.")
 
-        # Prepare required I/O files
         for filename in ["output_outputs", "inputs", "plant_output_outputs", "plant_inputs"]:
             open(os.path.join(user_path, filename), 'w').close()
 
-        # Write flags file (stopSim = True, pauseSim = True, stepOnce = True)
+        # stopSim = True, pauseSim = True, stepOnce = True
         flags = ["True", "True", "True"]
         with open(flags_path, "w") as f:
             f.write("\n".join(flags) + "\n")
@@ -332,6 +317,17 @@ def openPoST(user_path):
     return render_index(poST_code, plant_poST_code, Py_code, plant_Py_code, "", "", user_path, False, False)
 
 
+def changeTime(user_path):
+    newTime = request.form["timeValue"]
+    print(f"Received new scale: x{newTime}")
+
+    with open(user_path + "/time_scale", "w") as f:
+        f.write(newTime)
+        f.close()
+
+    return jsonify(success=True)
+
+
 @app.route('/', methods=["POST"])
 def user_post_methods():
     clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -367,16 +363,17 @@ def user_post_methods():
     elif request.form["action"] == "pauseSim":
         return pauseSimJSON(user_path)
 
+    elif request.form["action"] == "changeTime":
+        return changeTime(user_path)
+
 
 @app.route('/sessions/<session_id>/load_inputs', methods=["POST"])
 def loadInputsJSON(session_id):
     user_path = "sessions/" + session_id
     try:
-        # Debugging
         print(f"Content-Type: {request.content_type}")
         print(f"Raw data: {request.form}")
 
-        # We no longer check for application/json — the server expects form data
         if "action" not in request.form:
             raise ValueError("No action provided in form data")
 
@@ -384,7 +381,6 @@ def loadInputsJSON(session_id):
         if action != "loadInputs":
             raise ValueError(f"Unexpected action: {action}")
 
-        # Parse the JSON string from the form field
         inputs = json.loads(request.form["inputs"])
         print("Received controller inputs:", inputs)
 
@@ -394,7 +390,6 @@ def loadInputsJSON(session_id):
         global_inputs = json.loads(request.form["global_inputs"])
         print("Received global inputs:", global_inputs)
 
-        # Save inputs into sim_in
         with open(user_path + "/sim_in", "w") as f:
             json.dump(inputs, f, indent=4)
             f.close()
@@ -456,11 +451,10 @@ def get_main():
 
 @app.route('/sessions/<session_id>/<file_key>', methods=["GET"])
 def get_session_file(session_id, file_key):
-    # Only allow known keys
-    if file_key not in FILE_MAP:
+    if file_key not in api_file_map.FILE_MAP:
         abort(404, description=f"Unknown file key: {file_key}")
 
-    file_name = FILE_MAP[file_key]
+    file_name = api_file_map.FILE_MAP[file_key]
     file_path = f'./sessions/{session_id}/{file_name}'
 
     if not os.path.exists(file_path):
