@@ -4,6 +4,8 @@ RUN echo "**** Installing Python and Java****" && \
     apt-get install -y build-essential python3-pip openjdk-17-jdk ant
 WORKDIR /app
 COPY webUI.py webUI.py
+COPY api_file_map.py api_file_map.py
+COPY visualization_ports.py visualization_ports.py
 COPY poST2py.jar poST2py.jar
 COPY translate.sh translate.sh
 COPY translate_plant.sh translate_plant.sh
