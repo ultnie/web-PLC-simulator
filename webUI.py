@@ -110,6 +110,7 @@ def startSimJSON(user_path):
         open(user_path + "inputs", 'w').close()
         open(user_path + "plant_output_outputs", 'w').close()
         open(user_path + "plant_inputs", 'w').close()
+        open(user_path + "time_scale", 'w').close()
 
         print('Files created')
 
