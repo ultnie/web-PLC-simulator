@@ -108,10 +108,8 @@ def index():
         session['user'] = str(uuid.uuid4())
     user_path = f'./sessions/{session["user"]}/'
 
-    # Ensure user_path directory exists
     pathlib.Path(user_path).mkdir(parents=True, exist_ok=True)
 
-    # Initialize variables
     poST_code = ""
     plant_code = ""
     poST_code_py = ""
@@ -130,22 +128,18 @@ def index():
                 simulation_flag = lines[0].lower() == "true" if len(lines) > 0 else False
                 pause_flag = lines[1].lower() == "true" if len(lines) > 1 else False
         except Exception:
-            # fallback to defaults if reading fails
             simulation_flag = False
             pause_flag = False
     else:
-        # Create flags file with default values if missing
         with open(flags_path, "w") as f:
             f.write("False\nFalse\n")
 
-    # Helper to safely read files
     def safe_read(path):
         try:
             return read_from_file(path)
         except Exception:
             return ""
 
-    # Read all relevant files safely
     poST_code = safe_read(user_path + "code.post")
     plant_code = safe_read(user_path + "plant_code.post")
     poST_code_py = safe_read(user_path + "poST_code.py")
@@ -153,7 +147,6 @@ def index():
     out = safe_read(user_path + "out")
     plant_out = safe_read(user_path + "plant_out")
 
-    # Render the index page
     return render_index(poST_code, plant_code, poST_code_py, plant_code_py, out, plant_out, user_path, simulation_flag, pause_flag)
 
 
