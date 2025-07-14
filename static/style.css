@@ -10,6 +10,41 @@ h2 {
     text-align:center;
 }
 
+  #fontSizeDecrease, #fontSizeIncrease {
+    width: 30px;
+    height: 31px;
+    padding: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .font-control-group .input-group-prepend,
+  .font-control-group .input-group-append {
+    height: 31px;
+  }
+
+  .font-control-group #fontSizeInput {
+    height: 31px;
+    width: 50px;
+    text-align: center;
+    padding: 0.25rem;
+  }
+
+  #fontFamilySelect {
+    height: 31px;
+    padding: 0.25rem;
+  }
+
+#editor-poST,
+#editor-plant-poST {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
 textarea {
   width: 100%;
   height: 100%;
@@ -43,18 +78,6 @@ form {
 
 .editor-container {
   display: flex;
-  font-family: monospace;
   height: 100%;
-  overflow: hidden;
-}
-
-.line-numbers {
-  background-color: #f0f0f0;
-  color: #555;
-  padding: 8px 4px;
-  text-align: right;
-  user-select: none;
-  white-space: pre;
-  border-right: 1px solid #ccc;
   overflow: hidden;
 }

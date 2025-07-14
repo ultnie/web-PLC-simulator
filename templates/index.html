@@ -1,716 +1,814 @@
 <!doctype html>
 <html>
 <head>
-    <title>PLC Simulator</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=100vh, shrink-to-fit=yes">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+  <title>PLC Simulator</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=100vh, shrink-to-fit=yes">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
 </head>
-    <body>
-    <form method="POST" action="/" enctype="multipart/form-data" style="height: 90vh;">
-        <div class="row" style="height: 60vh; margin-bottom: 1%; min-height: 200px;">
-            <div class="col-6" style="display: flex; flex-direction: column; height: 60vh; overflow: hidden; min-height: 200px">
-              <ul class="nav nav-tabs" id="textTabs" role="tablist">
-                <li class="nav-item"><a class="nav-link active" id="post-tab" data-toggle="tab" href="#post" role="tab">Controller poST Code</a></li>
-                <li class="nav-item"><a class="nav-link" id="plant-post-tab" data-toggle="tab" href="#plant-post" role="tab">Plant poST Code</a></li>
-                <li class="nav-item"><a class="nav-link" id="py-tab" data-toggle="tab" href="#py" role="tab">Controller Py Code</a></li>
-                <li class="nav-item"><a class="nav-link" id="plant-py-tab" data-toggle="tab" href="#plant-py" role="tab">Plant Py Code</a></li>
-              </ul>
-
-              <div class="tab-content" id="textTabsContent" style="flex: 1; overflow-y: auto;">
-                <!-- poST Code -->
-                <div class="tab-pane fade show active" id="post" role="tabpanel" style="height: 100%;">
-                  <div class="editor-container" style="height: 89%; min-height:200px; overflow: hidden;">
-                    <div class="line-numbers" id="ln-post">1</div>
-                    <textarea id="poST_code" name="poST_code" placeholder="poST code"
-                              onscroll="syncScroll('poST_code', 'ln-post')" oninput="updateLineNumbers('poST_code', 'ln-post')"
-                              style="flex: 1; resize: none; overflow-y: auto; margin-bottom: 10px; height: 100%;">{{poST_code}}</textarea>
-                  </div>
-                        <button type="submit" class="btn btn-light" name="action" value="downloadPoST" style="margin-top: 1%; min-height:14px; max-height: 40px; width: 100%">Download</button>
-                </div>
-
-                <!-- Plant poST Code -->
-                <div class="tab-pane fade" id="plant-post" role="tabpanel" style="height: 100%;">
-                  <div class="editor-container" style="height: 89%; min-height:200px; overflow: hidden;">
-                    <div class="line-numbers" id="ln-plant-post">1</div>
-                    <textarea id="plant_poST_code" name="plant_poST_code" placeholder="plant poST code"
-                              onscroll="syncScroll('plant_poST_code', 'ln-plant-post')" oninput="updateLineNumbers('plant_poST_code', 'ln-plant-post')"
-                              style="flex: 1; resize: none; overflow-y: auto; margin-bottom: 10px; height: 100%;">{{plant_poST_code}}</textarea>
-                  </div>
-                    <button type="submit" class="btn btn-light" name="action" value="downloadPoST_plant" style="margin-top:1%; min-height:14px; max-height: 40px; width: 100%">Download</button>
-                </div>
-
-                <!-- Py Code -->
-                <div class="tab-pane fade" id="py" role="tabpanel" style="height: 100%;">
-                  <div class="editor-container" style="height: 89%; min-height:200px; overflow: hidden;">
-                    <div class="line-numbers" id="ln-py">1</div>
-                    <textarea id="Py_code" name="Py_code" placeholder="Py code" readonly
-                              onscroll="syncScroll('Py_code', 'ln-py')" oninput="updateLineNumbers('Py_code', 'ln-py')"
-                              style="flex: 1; resize: none; overflow-y: auto; margin-bottom: 10px; height: 100%;">{{Py_code}}</textarea>
-                  </div>
-                    <button type="submit" class="btn btn-light" name="action" value="downloadPy" style="margin-top: 1%; min-height: 14px; max-height: 40px; width: 100%">Download</button>
-                </div>
-
-                <!-- Plant Py Code -->
-                <div class="tab-pane fade" id="plant-py" role="tabpanel" style="height: 100%;">
-                  <div class="editor-container" style="height: 89%; min-height:200px; overflow: hidden;">
-                    <div class="line-numbers" id="ln-plant-py">1</div>
-                    <textarea id="plant_Py_code" name="Py_code" placeholder="Plant Py code" readonly
-                              onscroll="syncScroll('plant_Py_code', 'ln-plant-py')" oninput="updateLineNumbers('plant_Py_code', 'ln-plant-py')"
-                              style="flex: 1; resize: none; overflow-y: auto; margin-bottom: 10px; height: 100%;">{{plant_Py_code}}</textarea>
-                  </div>
-                    <button type="submit" class="btn btn-light" name="action" value="downloadPy_plant" style="margin-top: 1%; min-height: 14px; max-height: 40px; width: 100%">Download</button>
-                </div>
+<body>
+  <form method="POST" action="/" enctype="multipart/form-data" style="height: 90vh;">
+    <div class="row" style="height: 60vh; margin-bottom: 1%; min-height: 200px;">
+      <div class="col-6" style="display: flex; flex-direction: column; height: 60vh; overflow: hidden; min-height: 200px">
+        <div class="row mb-2">
+          <div class="col-md-12">
+            <div class="input-group input-group-sm font-control-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Font size</span>
+              </div>
+              <input type="number" id="fontSizeInput" class="form-control form-control-sm" value="14" min="8" max="36">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary btn-sm" id="fontSizeDecrease">-</button>
+                <button class="btn btn-outline-secondary btn-sm" id="fontSizeIncrease">+</button>
               </div>
             </div>
-
-            <div class="col-3" style="display: flex; flex-direction: column; height: 100%; overflow: auto; min-height: 200px">
-                <div>Inputs: </div>
-                <ul class="nav nav-tabs" id="inputTabs" role="tablist">
-                    <li class="nav-item"><a class="nav-link active" id="post-input-tab" data-toggle="tab" href="#post-input" role="tab">Controller</a></li>
-                    <li class="nav-item"><a class="nav-link" id="plant-input-tab" data-toggle="tab" href="#plant-input" role="tab">Plant</a></li>
-                    <li class="nav-item"><a class="nav-link" id="globals-input-tab" data-toggle="tab" href="#globals-input" role="tab">Global</a></li>
-                </ul>
-                <div class="tab-content" id="inputTabsContent" style="height: 100%; max-height: 100%; overflow: scroll;">
-                    <div class="tab-pane fade show active" id="post-input" role="tabpanel" style="height: 100%; overflow-y:auto;">
-                            <ul class="list-group border" id="assetNameMenu" style="width:100%; height:100%; min-height:200px;">
-                            </ul>
-                    </div>
-
-                    <div class="tab-pane fade" id="plant-input" role="tabpanel" style="height: 100%; overflow-y:auto;">
-                            <ul class="list-group border" id="plant_assetNameMenu" style="width:100%; height:100%; min-height:200px;">
-                            </ul>
-                    </div>
-
-                    <div class="tab-pane fade" id="globals-input" role="tabpanel" style="height: 100%; overflow-y:auto;">
-                        <ul class="list-group border" id="globals_assetNameMenu" style="width:100%; height:100%; min-height:200px;"></ul>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-light" id="loadInputsButton" style="max-height: 40px; margin-top: 1%; min-height: 14px">Load Inputs</button>
-            </div>
-
-            <div class="col-3" style="display: flex; flex-direction: column; min-height:200px;">
-                <ul class="nav nav-tabs" id="outputTabs" role="tablist">
-                    <li class="nav-item"><a class="nav-link active" id="post-output-tab" data-toggle="tab" href="#post-output" role="tab">Controller Outputs</a></li>
-                    <li class="nav-item"><a class="nav-link" id="plant-output-tab" data-toggle="tab" href="#plant-output" role="tab">Plant Outputs</a></li>
-                </ul>
-                <div class="tab-content" id="outputTabsContent" style="flex: 1;">
-                    <div class="tab-pane fade show active" id="post-output" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
-                        <textarea type="text" id="outputs" name="outputs" placeholder="Outputs" readonly="" style="width:100%; height:100%; resize: none;"></textarea>
-                    </div>
-                    <div class="tab-pane fade" id="plant-output" role="tabpanel" style="height: 100%; margin-bottom: 10px; overflow-y:auto;">
-                        <textarea type="text" id="plant_outputs" name="plant_outputs" placeholder="Plant Outputs" readonly="" style="width:100%; height:100%; resize: none;"></textarea>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-
-        <div class="row" style="height: 25vh;">
-            <div class="col-6" style="display: flex; flex-direction: column;">
-                <ul class="nav nav-tabs" id="errorTabs" role="tablist">
-                    <li class="nav-item"><a class="nav-link active" id="post-error-tab" data-toggle="tab" href="#post-error" role="tab">Controller Translator Outputs</a></li>
-                    <li class="nav-item"><a class="nav-link" id="plant-error-tab" data-toggle="tab" href="#plant-error" role="tab">Plant Translator Outputs</a></li>
-                </ul>
-                <div class="tab-content" id="errorTabsContent" style="flex: 1; margin-bottom: 10px;">
-                    <div class="tab-pane fade show active" id="post-error" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
-                        <textarea type="text" name="out" placeholder="PoST Errors" readonly style="width:100%; height:100%; resize: none;">{{out}}</textarea>
-                    </div>
-                    <div class="tab-pane fade" id="plant-error" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
-                        <textarea type="text" name="plant_out" placeholder="Plant Errors" readonly style="width:100%; height:100%; resize: none;">{{plant_out}}</textarea>
-                    </div>
-                </div>
+        <ul class="nav nav-tabs" id="textTabs" role="tablist">
+          <li class="nav-item"><a class="nav-link active" id="post-tab" data-toggle="tab" href="#post" role="tab">Controller poST Code</a></li>
+          <li class="nav-item"><a class="nav-link" id="plant-post-tab" data-toggle="tab" href="#plant-post" role="tab">Plant poST Code</a></li>
+          <li class="nav-item"><a class="nav-link" id="py-tab" data-toggle="tab" href="#py" role="tab">Controller Py Code</a></li>
+          <li class="nav-item"><a class="nav-link" id="plant-py-tab" data-toggle="tab" href="#plant-py" role="tab">Plant Py Code</a></li>
+        </ul>
+        <div class="tab-content" id="textTabsContent" style="flex: 1; overflow-y: auto;">
+          <div class="tab-pane fade show active" id="post" role="tabpanel" style="height: 100%;">
+            <div class="editor-container" style="height: 88%; min-height:200px; overflow: hidden;">
+              <div id="editor-poST" style="width: 100%; height: 100%;"></div>
+              <input type="hidden" name="poST_code" id="hidden-poST">
             </div>
-            <div class="col">
-                <label style="margin-bottom: 10px;">Open poST Controller code:</label>
-                <input type="file" name="file" style="padding-bottom: 1px; margin-bottom: 20px;">
-                <label style="margin-bottom: 10px;">Open poST Plant code:</label>
-                <input type="file" name="file_plant" style="padding-bottom: 1px; margin-bottom: 20px;">
-                <button type="submit" class="btn btn-light" name="action" value="openPoST" style="margin-bottom: 20px; height: 50px;">Open</button>
+            <button type="submit" class="btn btn-light" name="action" value="downloadPoST" style="margin-top: 1%; min-height:14px; max-height: 40px; width: 100%">Download</button>
+          </div>
+          <div class="tab-pane fade" id="plant-post" role="tabpanel" style="height: 100%;">
+            <div class="editor-container" style="height: 88%; min-height:200px; overflow: hidden;">
+              <div id="editor-plant-poST" style="width: 100%; height: 100%;"></div>
+              <input type="hidden" name="plant_poST_code" id="hidden-plant-poST">
             </div>
-            <div class="col">
-                <button type="submit" id="translateButton" class="btn btn-light" name="action" value="translate" style="margin-bottom: 10px; height: 40px; width: 100%">Translate</button>
-                <div>Visualization:</div>
-                <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{editor}}?session={{session}}', 'editorPopupWindow', 'location=yes, resizable=yes, scrollbars=yes, fullscreen=yes'); return false;">
-                    Editor
-                </a>
-                <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{editor}}?session={{session}}', 'editorTab'); return false;">
-                    Editor
-                </a>
-                <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{viewer}}?session={{session}}', 'viewerPopupWindow', 'location=yes, resizable=yes, scrollbars=yes, fullscreen=yes'); return false;">
-                    Viewer
-                </a>
-                <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{viewer}}?session={{session}}', 'viewerTab'); return false;">
-                    Viewer
-                </a>
+            <button type="submit" class="btn btn-light" name="action" value="downloadPoST_plant" style="margin-top:1%; min-height:14px; max-height: 40px; width: 100%">Download</button>
+          </div>
+          <div class="tab-pane fade" id="py" role="tabpanel" style="height: 100%;">
+            <div class="editor-container" style="height: 88%; min-height:200px; overflow: hidden;">
+              <div id="editor-py" style="width: 100%; height: 100%;"></div>
+              <input type="hidden" name="Py_code" id="hidden-py">
             </div>
-            <div class="col">
-                <button type="submit" id="startSimButton" class="btn btn-light" name="action" value="startSim" style="margin-bottom: 10px; height: 40px;">Start</button>
-                <button type="submit" id="stopSimButton" class="btn btn-light" name="action" value="stopSim" style="margin-bottom: 10px; height: 40px;">Stop</button>
-                <button type="submit" id="pauseSimButton" class="btn btn-light" name="action" value="pauseSim" style="margin-bottom: 10px; height: 40px;">Pause/Unpause</button>
-                <button type="submit" id="stepSimButton" class="btn btn-light" name="action" value="stepSim" style="margin-bottom: 10px; height: 40px;">One Cycle</button>
-                <div>Time Scale: </div>
-                <div class="row" style="margin: 0px;">
-                        <input type="number" id="time" name="timeValue" class="form-control" placeholder="1.0" style="margin-bottom: 10px; margin-right: 5%; height: 40px; min-width: 63px; width: 55%">
-                        <button type="submit" id="changeTimeButton" class="btn btn-light" name="action" value="changeTime" style="margin-bottom: 10px; height: 40px; min-width: 63px; width: 40%;">Set</button>
-                </div>
+            <button type="submit" class="btn btn-light" name="action" value="downloadPy" style="margin-top: 1%; min-height: 14px; max-height: 40px; width: 100%">Download</button>
+          </div>
+          <div class="tab-pane fade" id="plant-py" role="tabpanel" style="height: 100%;">
+            <div class="editor-container" style="height: 88%; min-height:200px; overflow: hidden;">
+              <div id="editor-plant-py" style="width: 100%; height: 100%;"></div>
+              <input type="hidden" name="plant_Py_code" id="hidden-plant-py">
             </div>
+            <button type="submit" class="btn btn-light" name="action" value="downloadPy_plant" style="margin-top: 1%; min-height: 14px; max-height: 40px; width: 100%">Download</button>
+          </div>
         </div>
-    </form>
+      </div>
+      <div class="col-3" style="display: flex; flex-direction: column; height: 100%; overflow: auto; min-height: 200px">
+        <div>Inputs: </div>
+        <ul class="nav nav-tabs" id="inputTabs" role="tablist">
+          <li class="nav-item"><a class="nav-link active" id="post-input-tab" data-toggle="tab" href="#post-input" role="tab">Controller</a></li>
+          <li class="nav-item"><a class="nav-link" id="plant-input-tab" data-toggle="tab" href="#plant-input" role="tab">Plant</a></li>
+          <li class="nav-item"><a class="nav-link" id="globals-input-tab" data-toggle="tab" href="#globals-input" role="tab">Global</a></li>
+        </ul>
+        <div class="tab-content" id="inputTabsContent" style="height: 100%; max-height: 100%; overflow: scroll;">
+          <div class="tab-pane fade show active" id="post-input" role="tabpanel" style="height: 100%; overflow-y:auto;">
+            <ul class="list-group border" id="assetNameMenu" style="width:100%; height:100%; min-height:200px;"></ul>
+          </div>
+          <div class="tab-pane fade" id="plant-input" role="tabpanel" style="height: 100%; overflow-y:auto;">
+            <ul class="list-group border" id="plant_assetNameMenu" style="width:100%; height:100%; min-height:200px;"></ul>
+          </div>
+          <div class="tab-pane fade" id="globals-input" role="tabpanel" style="height: 100%; overflow-y:auto;">
+            <ul class="list-group border" id="globals_assetNameMenu" style="width:100%; height:100%; min-height:200px;"></ul>
+          </div>
+        </div>
+        <button type="button" class="btn btn-light" id="loadInputsButton" style="max-height: 40px; margin-top: 1%; min-height: 14px">Load Inputs</button>
+      </div>
+      <div class="col-3" style="display: flex; flex-direction: column; min-height:200px;">
+        <ul class="nav nav-tabs" id="outputTabs" role="tablist">
+          <li class="nav-item"><a class="nav-link active" id="post-output-tab" data-toggle="tab" href="#post-output" role="tab">Controller Outputs</a></li>
+          <li class="nav-item"><a class="nav-link" id="plant-output-tab" data-toggle="tab" href="#plant-output" role="tab">Plant Outputs</a></li>
+        </ul>
+        <div class="tab-content" id="outputTabsContent" style="flex: 1;">
+          <div class="tab-pane fade show active" id="post-output" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
+            <textarea type="text" id="outputs" name="outputs" placeholder="Outputs" readonly="" style="width:100%; height:100%; resize: none;"></textarea>
+          </div>
+          <div class="tab-pane fade" id="plant-output" role="tabpanel" style="height: 100%; margin-bottom: 10px; overflow-y:auto;">
+            <textarea type="text" id="plant_outputs" name="plant_outputs" placeholder="Plant Outputs" readonly="" style="width:100%; height:100%; resize: none;"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="height: 25vh;">
+      <div class="col-6" style="display: flex; flex-direction: column;">
+        <ul class="nav nav-tabs" id="errorTabs" role="tablist">
+          <li class="nav-item"><a class="nav-link active" id="post-error-tab" data-toggle="tab" href="#post-error" role="tab">Controller Translator Outputs</a></li>
+          <li class="nav-item"><a class="nav-link" id="plant-error-tab" data-toggle="tab" href="#plant-error" role="tab">Plant Translator Outputs</a></li>
+        </ul>
+        <div class="tab-content" id="errorTabsContent" style="flex: 1; margin-bottom: 10px;">
+          <div class="tab-pane fade show active" id="post-error" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
+            <textarea type="text" name="out" placeholder="PoST Errors" readonly style="width:100%; height:100%; resize: none;">{{out}}</textarea>
+          </div>
+          <div class="tab-pane fade" id="plant-error" role="tabpanel" style="height: 100%; margin-bottom: 10px;">
+            <textarea type="text" name="plant_out" placeholder="Plant Errors" readonly style="width:100%; height:100%; resize: none;">{{plant_out}}</textarea>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <label style="margin-bottom: 10px;">Open poST Controller code:</label>
+        <input type="file" name="file" style="padding-bottom: 1px; margin-bottom: 20px;">
+        <label style="margin-bottom: 10px;">Open poST Plant code:</label>
+        <input type="file" name="file_plant" style="padding-bottom: 1px; margin-bottom: 20px;">
+        <button type="submit" class="btn btn-light" name="action" value="openPoST" style="margin-bottom: 20px; height: 50px;">Open</button>
+      </div>
+      <div class="col">
+        <button type="submit" id="translateButton" class="btn btn-light" name="action" value="translate" style="margin-bottom: 10px; height: 40px; width: 100%">Translate</button>
+        <div>Visualization:</div>
+        <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{editor}}?session={{session}}', 'editorPopupWindow', 'location=yes, resizable=yes, scrollbars=yes, fullscreen=yes'); return false;">Editor</a>
+        <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{editor}}?session={{session}}', 'editorTab'); return false;">Editor</a>
+        <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{viewer}}?session={{session}}', 'viewerPopupWindow', 'location=yes, resizable=yes, scrollbars=yes, fullscreen=yes'); return false;">Viewer</a>
+        <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{viewer}}?session={{session}}', 'viewerTab'); return false;">Viewer</a>
+      </div>
+      <div class="col">
+        <button type="submit" id="startSimButton" class="btn btn-light" name="action" value="startSim" style="margin-bottom: 10px; height: 40px;">Start</button>
+        <button type="submit" id="stopSimButton" class="btn btn-light" name="action" value="stopSim" style="margin-bottom: 10px; height: 40px;">Stop</button>
+        <button type="submit" id="pauseSimButton" class="btn btn-light" name="action" value="pauseSim" style="margin-bottom: 10px; height: 40px;">Pause/Unpause</button>
+        <button type="submit" id="stepSimButton" class="btn btn-light" name="action" value="stepSim" style="margin-bottom: 10px; height: 40px;">One Cycle</button>
+        <div>Time Scale: </div>
+        <div class="row" style="margin: 0px;">
+          <input type="number" id="time" name="timeValue" class="form-control" placeholder="1.0" style="margin-bottom: 10px; margin-right: 5%; height: 40px; min-width: 63px; width: 55%">
+          <button type="submit" id="changeTimeButton" class="btn btn-light" name="action" value="changeTime" style="margin-bottom: 10px; height: 40px; min-width: 63px; width: 40%;">Set</button>
+        </div>
+      </div>
+    </div>
+  </form>
+  <script>
+  window.addEventListener('DOMContentLoaded', function () {
+    require.config({
+      paths: {
+        vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs'
+      }
+    });
 
-    <script>
-        function updateLineNumbers(textareaId, lineNumberId) {
-          const textarea = document.getElementById(textareaId);
-          const lineNumbers = document.getElementById(lineNumberId);
-          const lines = textarea.value.split('\n').length;
-          lineNumbers.textContent = Array.from({ length: lines }, (_, i) => i + 1).join('\n');
+    let editors = {};
+    let sim = {{sim}} || false;
+    let isPaused = {{pause}} || false;
+    let outputsInterval;
+
+    function updateAllEditorsFontSize(fontSize) {
+      const lineHeight = Math.floor(fontSize * 1.4);
+      Object.values(editors).forEach(editor => {
+        editor.updateOptions({
+          fontSize: fontSize,
+          lineHeight: lineHeight
+        });
+      });
+      localStorage.setItem('monacoFontSize', fontSize);
+    }
+
+    function initFontSizeControls() {
+      const savedFontSize = parseInt(localStorage.getItem('monacoFontSize')) || 14;
+      $('#fontSizeInput').val(savedFontSize);
+
+      $('#fontSizeInput').change(function(e) {
+        e.preventDefault();
+        const newSize = Math.min(36, Math.max(8, parseInt($(this).val()))) || 14;
+        $(this).val(newSize);
+        updateAllEditorsFontSize(newSize);
+      });
+
+      $('#fontSizeDecrease').click(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const currentSize = parseInt($('#fontSizeInput').val());
+        if (currentSize > 8) {
+          $('#fontSizeInput').val(currentSize - 1).trigger('change');
         }
+      });
 
-        function syncScroll(textareaId, lineNumberId) {
-          const textarea = document.getElementById(textareaId);
-          const lineNumbers = document.getElementById(lineNumberId);
-          lineNumbers.scrollTop = textarea.scrollTop;
+      $('#fontSizeIncrease').click(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const currentSize = parseInt($('#fontSizeInput').val());
+        if (currentSize < 36) {
+          $('#fontSizeInput').val(currentSize + 1).trigger('change');
         }
+      });
+    }
 
-        window.onload = function () {
-          updateLineNumbers('poST_code', 'ln-post');
-          updateLineNumbers('plant_poST_code', 'ln-plant-post');
-          updateLineNumbers('Py_code', 'ln-py');
-          updateLineNumbers('plant_Py_code', 'ln-plant-py');
+    function createMonacoEditors() {
+      require(['vs/editor/editor.main'], function () {
+        monaco.languages.register({ id: 'post' });
+
+        monaco.languages.setMonarchTokensProvider('post', {
+          defaultToken: '',
+          keywords: [
+            'PROGRAM', 'END_PROGRAM', 'VAR', 'VAR_INPUT', 'VAR_OUTPUT', 'VAR_GLOBAL', 'END_VAR',
+            'PROCESS', 'END_PROCESS', 'STATE', 'END_STATE', 'TIMEOUT', 'END_TIMEOUT',
+            'START', 'STOP', 'SET', 'NEXT', 'AND', 'OR', 'XOR',
+            'IF', 'THEN', 'ELSE', 'END_IF', 'CASE', 'OF', 'END_CASE',
+            'FOR', 'TO', 'BY', 'DO', 'END_FOR', 'WHILE', 'DO', 'END_WHILE',
+            'REPEAT', 'UNTIL', 'END_REPEAT', 'EXIT', 'RETURN'
+          ],
+          typeKeywords: [
+            'BOOL', 'BYTE', 'WORD', 'DWORD', 'INT', 'DINT', 'REAL', 'LREAL',
+            'TIME', 'DATE', 'TOD', 'DT', 'STRING', 'ARRAY', 'OF', 'STRUCT', 'END_STRUCT',
+            'TRUE', 'FALSE'
+          ],
+          operators: [
+            '=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=',
+            '&&', '||', '++', '--', '+', '-', '*', '/', '&', '|', '^', '%',
+            '<<', '>>', '>>>', '+=', '-=', '*=', '/=', '&=', '|=', '^=',
+            '%=', '<<=', '>>=', '>>>=', ':', ':='
+          ],
+          symbols: /[=><!~?:&|+\-*\/\^%]+/,
+          escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
+          tokenizer: {
+            root: [
+              [/[a-zA-Z_]\w*/, {
+                cases: {
+                  '@keywords': 'keyword',
+                  '@typeKeywords': 'type',
+                  '@default': 'identifier'
+                }
+              }],
+              { include: '@whitespace' },
+              [/[{}()\[\]]/, '@brackets'],
+              [/[<>](?!@symbols)/, '@brackets'],
+              [/@symbols/, {
+                cases: {
+                  '@operators': 'operator',
+                  '@default': ''
+                }
+              }],
+              [/\d*\.\d+([eE][\-+]?\d+)?/, 'number.float'],
+              [/0[xX][0-9a-fA-F]+/, 'number.hex'],
+              [/\d+/, 'number'],
+              [/[;,.]/, 'delimiter'],
+              [/"([^"\\]|\\.)*$/, 'string.invalid'],
+              [/"/, 'string', '@string'],
+              [/\/\/.*$/, 'comment'],
+              [/\/\*/, 'comment', '@comment']
+            ],
+            whitespace: [
+              [/[ \t\r\n]+/, 'white'],
+              [/\/\*/, 'comment', '@comment'],
+              [/\/\/.*$/, 'comment']
+            ],
+            comment: [
+              [/[^\/*]+/, 'comment'],
+              [/\*\//, 'comment', '@pop'],
+              [/[\/*]/, 'comment']
+            ],
+            string: [
+              [/[^\\"]+/, 'string'],
+              [/@escapes/, 'string.escape'],
+              [/\\./, 'string.escape.invalid'],
+              [/"/, 'string', '@pop']
+            ]
+          }
+        });
+
+        monaco.editor.defineTheme('post-theme', {
+          base: 'vs',
+          inherit: true,
+          rules: [
+            { token: 'keyword', foreground: '0000FF' },
+            { token: 'type', foreground: '267F99' },
+            { token: 'operator', foreground: '000000' },
+            { token: 'number', foreground: '098658' },
+            { token: 'string', foreground: 'A31515' },
+            { token: 'comment', foreground: '008000' },
+            { token: 'identifier', foreground: '001080' },
+            { token: 'delimiter', foreground: '000000' }
+          ],
+          colors: {
+            'editor.foreground': '#000000',
+            'editor.background': '#FFFFFE',
+            'editor.lineHighlightBackground': '#F5F5F5',
+            'editorLineNumber.foreground': '#2B91AF',
+            'editor.selectionBackground': '#ADD6FF',
+            'editorCursor.foreground': '#000000'
+          }
+        });
+
+        const fontSize = parseInt(localStorage.getItem('monacoFontSize')) || 14;
+        const lineHeight = Math.floor(fontSize * 1.4);
+
+        const commonPostOptions = {
+          language: 'post',
+          theme: 'post-theme',
+          automaticLayout: true,
+          lineNumbers: 'on',
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+          fontSize: fontSize,
+          lineHeight: lineHeight,
+          folding: true,
+          wordWrap: 'on',
+          formatOnPaste: true,
+          formatOnType: true,
+          renderWhitespace: 'none',
+          scrollbar: {
+            vertical: 'auto',
+            horizontal: 'auto',
+            useShadows: true
+          }
         };
-    </script>
 
-        <script>
-            $('document').ready(function() {
-                document.getElementById('poST_code').addEventListener('keydown', function(e) {
-                    if (e.key == 'Tab') {
-                        e.preventDefault();
-                        var start = this.selectionStart;
-                        var end = this.selectionEnd;
-                        this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
-                        this.selectionStart = this.selectionEnd = start + 1;
-                    }
-                });
-            })
-        </script>
-        <script>
-            let sim = {{sim}} || false;
+        const commonPyOptions = {
+          language: 'python',
+          theme: 'vs',
+          automaticLayout: true,
+          readOnly: true,
+          lineNumbers: 'on',
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+          fontSize: fontSize,
+          lineHeight: lineHeight,
+          renderWhitespace: 'none'
+        };
 
-            function updateOutputs() {
-                $.get("{{outputs}}")
-                    .done(function(data) {
-                        console.log("AJAX request successful");
+        editors['poST'] = monaco.editor.create(
+          document.getElementById('editor-poST'),
+          Object.assign({ value: {{ poST_code | tojson | safe }} || "" }, commonPostOptions)
+        );
 
-                        try {
-                            console.log("Raw data received:", data);
-                            console.log("Type of data:", typeof data);
+        editors['plant-poST'] = monaco.editor.create(
+          document.getElementById('editor-plant-poST'),
+          Object.assign({ value: {{ plant_poST_code | tojson | safe }} || "" }, commonPostOptions)
+        );
 
-                            if (typeof data !== 'object') {
-                                data = JSON.parse(data); // Parse if it's a string
-                            }
+        editors['py'] = monaco.editor.create(
+          document.getElementById('editor-py'),
+          Object.assign({ value: {{ Py_code | tojson | safe }} || "" }, commonPyOptions)
+        );
 
-                            let formattedOutput = formatNestedJson(data);
-                            $('#outputs').text(formattedOutput);
-                        } catch (e) {
-                            console.error("Error parsing JSON:", e);
-                            $('#outputs').text("Invalid JSON response");
-                        }
-                    })
-                    .fail(function(xhr, status, error) {
-                        console.error("AJAX error fetching outputs:");
-                        console.error("Status:", status);
-                        console.error("Error:", error);
-                        console.error("Response text:", xhr.responseText);
-                    });
+        editors['plant-py'] = monaco.editor.create(
+          document.getElementById('editor-plant-py'),
+          Object.assign({ value: {{ plant_Py_code | tojson | safe }} || "" }, commonPyOptions)
+        );
 
-                    $.get("{{plant_outputs}}")
-                    .done(function(data) {
-                        console.log("AJAX request successful");
+        initFontSizeControls();
+        initSimulationControls();
 
-                        try {
-                            console.log("Raw data received:", data);
-                            console.log("Type of data:", typeof data);
+        setTimeout(() => {
+          Object.values(editors).forEach(editor => editor.layout());
+        }, 100);
+      });
+    }
 
-                            if (typeof data !== 'object') {
-                                data = JSON.parse(data); // Parse if it's a string
-                            }
+    function initSimulationControls() {
+      function updateButtonStates() {
+        let pyCodeNotEmpty = editors['py'] && editors['py'].getValue().trim().length > 0;
+        $('#startSimButton').prop('disabled', sim || !pyCodeNotEmpty);
+        $('#stepSimButton').prop('disabled', !pyCodeNotEmpty);
+        $('#pauseSimButton').prop('disabled', !sim);
+        $('#stopSimButton').prop('disabled', !sim);
+        $('#loadInputsButton').prop('disabled', !sim);
+        $('#changeTimeButton').prop('disabled', !sim);
 
-                            let formattedOutput = formatNestedJson(data);
-                            $('#plant_outputs').text(formattedOutput);
-                        } catch (e) {
-                            console.error("Error parsing JSON:", e);
-                            $('#plant_outputs').text("Invalid JSON response");
-                        }
-                    })
-                    .fail(function(xhr, status, error) {
-                        console.error("AJAX error fetching outputs:");
-                        console.error("Status:", status);
-                        console.error("Error:", error);
-                        console.error("Response text:", xhr.responseText);
-                    });
-            }
+        if (isPaused) {
+            $('#pauseSimButton').text('Resume');
+        }
+        else {
+            $('#pauseSimButton').text('Pause');
+        }
+      }
 
-            // Helper function to format nested JSON
-            function formatNestedJson(obj, indent = 0) {
-                let formatted = '';
-                for (const [key, value] of Object.entries(obj)) {
-                    const spaces = ' '.repeat(indent);
-                    if (typeof value === 'object' && value !== null) {
-                        formatted += `${spaces}${key}:\n${formatNestedJson(value, indent + 2)}`;
-                    } else {
-                        formatted += `${spaces}${key}: ${value}\n`;
-                    }
-                }
-                return formatted;
-            }
+      let outputsLoaded = false;
+      let updateOutputsTimeout = null;
+      let plantOutputsLoaded = false;
+      let updatePlantOutputsTimeout = null;
+      const MAX_RETRIES = 3;
+      let outputsRetryCount = 0;
+      let plantOutputsRetryCount = 0;
+      let emptyOutputsCount = 0;
+      let emptyPlantOutputsCount = 0;
+      const MAX_EMPTY_RETRIES = 3;
 
+      $('#translateButton').click(function(e) {
+          e.preventDefault();
 
-            let inputsLoaded = false;
-            let plant_inputsLoaded = false;
-            let globalsLoaded = false;
-            let updateInputsTimeout = null;
-            let updatePlantInputsTimeout = null;
-            let updateGlobalsTimeout = null;
+          // Set button to loading state
+          const translateBtn = $(this);
+          translateBtn.prop('disabled', true).text('Translating...');
 
-            //TODO: update plant Inputs as well
-            function updateInputs() {
-                if (inputsLoaded) return; // Stop if inputs are already loaded
+          // Update hidden fields with editor content
+          document.getElementById('hidden-poST').value = editors['poST'].getValue();
+          document.getElementById('hidden-plant-poST').value = editors['plant-poST'].getValue();
+          document.getElementById('hidden-py').value = editors['py'].getValue();
+          document.getElementById('hidden-plant-py').value = editors['plant-py'].getValue();
 
-                inputsLoaded = true;
+          // Create a hidden input for the action
+          const actionInput = $('<input>')
+            .attr('type', 'hidden')
+            .attr('name', 'action')
+            .val('translate');
 
-                $.get("{{inputs}}", function(data) {
-                    console.log("Raw input data received:", data);
+          // Add it to the form and submit
+          $('form').append(actionInput).submit();
+        });
 
-                    if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-
-                        if (updateInputsTimeout) {
-                            clearTimeout(updateInputsTimeout);
-                            updateInputsTimeout = null;
-                        }
-
-                        let assetList = $('#assetNameMenu');
-                        assetList.empty();
-
-                        $.each(data, function(key, value) {
-                            // Skip if value is an array
-                            if (Array.isArray(value)) {
-                                return;
-                            }
-
-                            let li = $('<li/>').addClass('ui-menu-item').attr('role', 'menuitem');
-
-                            let input;
-                            if (typeof value === 'boolean') {
-                                input = $('<input/>')
-                                    .attr('type', 'checkbox')
-                                    .prop('checked', value);
-                            } else if (typeof value === 'number') {
-                                input = $('<input/>')
-                                    .attr('type', 'number')
-                                    .val(value);
-                            } else {
-                                input = $('<input/>')
-                                    .attr('type', 'text')
-                                    .val(value);
-                            }
-
-                            input.addClass('ui-all').attr('name', key).appendTo(li);
-
-                            $('<label/>')
-                                .addClass('ui-all')
-                                .text(`${key}: ${value}`)
-                                .appendTo(li);
-
-                            li.appendTo(assetList);
-                        });
-
-                        console.log("Inputs updated successfully");
-                    } else {
-                        console.warn("Empty or invalid input data received — will retry");
-                        inputsLoaded = false;
-                        updateInputsTimeout = setTimeout(updateInputs, 1000);
-                    }
-                }).fail(function(err) {
-                    console.error("AJAX error fetching inputs:", err);
-                    inputsLoaded = false;
-                    updateInputsTimeout = setTimeout(updateInputs, 1000);
-                });
-            }
-
-            function updatePlantInputs() {
-                if (plant_inputsLoaded) return;
-
-                plant_inputsLoaded = true;
-
-                $.get("{{plant_inputs}}", function(data) {
-                    console.log("Raw input data received:", data);
-
-                    if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-
-                        if (updatePlantInputsTimeout) {
-                            clearTimeout(updatePlantInputsTimeout);
-                            updatePlantInputsTimeout = null;
-                        }
-
-                        let assetList = $('#plant_assetNameMenu');
-                        assetList.empty();
-
-                        $.each(data, function(key, value) {
-                            // Skip if value is an array
-                            if (Array.isArray(value)) {
-                                return;
-                            }
-
-                            let li = $('<li/>').addClass('ui-menu-item').attr('role', 'menuitem');
-
-                            let input;
-                            if (typeof value === 'boolean') {
-                                input = $('<input/>')
-                                    .attr('type', 'checkbox')
-                                    .prop('checked', value);
-                            } else if (typeof value === 'number') {
-                                input = $('<input/>')
-                                    .attr('type', 'number')
-                                    .val(value);
-                            } else {
-                                input = $('<input/>')
-                                    .attr('type', 'text')
-                                    .val(value);
-                            }
-
-                            input.addClass('ui-all').attr('name', key).appendTo(li);
-
-                            $('<label/>')
-                                .addClass('ui-all')
-                                .text(`${key}: ${value}`)
-                                .appendTo(li);
-
-                            li.appendTo(assetList);
-                        });
-
-                        console.log("Plant inputs updated successfully");
-
-                    } else {
-                        console.warn("Empty or invalid plant input data received — will retry");
-                        plant_inputsLoaded = false;
-                        updatePlantInputsTimeout = setTimeout(updatePlantInputs, 1000);
-                    }
-                }).fail(function(err) {
-                    console.error("AJAX error fetching plant inputs:", err);
-                    plant_inputsLoaded = false;
-                    updatePlantInputsTimeout = setTimeout(updatePlantInputs, 1000);
-                });
-            }
-
-            function updateGlobals() {
-                if (globalsLoaded) return;
-
-                globalsLoaded = true;
-
-                $.get("{{globals}}", function(data) {
-                    console.log("Raw input data received:", data);
-
-                    if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-
-                        if (updateGlobalsTimeout) {
-                            clearTimeout(updateGlobalsTimeout);
-                            updateGlobalsTimeout = null;
-                        }
-
-                        let assetList = $('#globals_assetNameMenu');
-                        assetList.empty();
-
-                        $.each(data, function(key, value) {
-                            // Skip if value is an array
-                            if (Array.isArray(value)) {
-                                return;
-                            }
-
-                            let li = $('<li/>').addClass('ui-menu-item').attr('role', 'menuitem');
-
-                            let input;
-                            if (typeof value === 'boolean') {
-                                input = $('<input/>')
-                                    .attr('type', 'checkbox')
-                                    .prop('checked', value);
-                            } else if (typeof value === 'number') {
-                                input = $('<input/>')
-                                    .attr('type', 'number')
-                                    .val(value);
-                            } else {
-                                input = $('<input/>')
-                                    .attr('type', 'text')
-                                    .val(value);
-                            }
-
-                            input.addClass('ui-all').attr('name', key).appendTo(li);
-
-                            $('<label/>')
-                                .addClass('ui-all')
-                                .text(`${key}: ${value}`)
-                                .appendTo(li);
-
-                            li.appendTo(assetList);
-                        });
-
-                        console.log("Globals updated successfully");
-
-                    } else {
-                        console.warn("Empty or invalid globals data received — will retry");
-                        globalsLoaded = false;
-                        updateGlobalsTimeout = setTimeout(updateGlobals, 1000);
-                    }
-                }).fail(function(err) {
-                    console.error("AJAX error fetching globals:", err);
-                    globalsLoaded = false;
-                    updateGlobalsTimeout = setTimeout(updateGlobals, 1000);
-                });
-            }
-
-            let outputsInterval;
-
-            function setSimState(state) {
-                console.log("setSimState called with state:", state);
-                sim = state;
-                $("input[name='sim']").val(sim);
-                if (sim) {
-                    console.log("Forcing start of intervals"); // Debugging line
-                    if (outputsInterval) {
-                        clearInterval(outputsInterval);
-                    }
-                    outputsInterval = setInterval(function() {
-                        console.log("updateOutputs interval running");
-                        updateOutputs();
-                    }, 1000);
-                    updateInputs();
-                    updatePlantInputs();
-                    updateGlobals();
-                    console.log("updateOutputs function:", updateOutputs);
+      function updateOutputs() {
+        if (sim) {
+          $.get("{{outputs}}")
+            .done(function(data) {
+              try {
+                if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                  emptyOutputsCount = 0;
+                  outputsRetryCount = 0;
+                  let formattedOutput = formatNestedJson(data);
+                  $('#outputs').text(formattedOutput);
                 } else {
-                    console.log("Stopping intervals");
-                    clearInterval(outputsInterval);
-                    outputsInterval = null;
+                  emptyOutputsCount++;
+                  if (emptyOutputsCount >= MAX_EMPTY_RETRIES) return;
+                  setTimeout(updateOutputs, 1000);
                 }
-            }
-
-
-            $(document).ready(function() {
-                // Disable/enable buttons based on sim state and PyCode content
-                function updateButtonStates() {
-                console.log("Updating button states. Current sim state:", sim);
-                let pyCodeNotEmpty = $('#Py_code').val().trim().length > 0;
-                $('#startSimButton').prop('disabled', sim || !pyCodeNotEmpty); // Start only enabled when sim is false and PyCode has content
-                $('#stepSimButton').prop('disabled', !pyCodeNotEmpty);
-                $('#pauseSimButton').prop('disabled', !sim);                  // Pause only active when sim is running
-                $('#stopSimButton').prop('disabled', !sim);                   // Stop only active when sim is running
-                $('#loadInputsButton').prop('disabled', !sim);                // Load Inputs only enabled when sim is running
-                $('#changeTimeButton').prop('disabled', !sim);
-
-                // Simplified functionality: run setSimState with current sim value
-                setSimState(sim);
-            }
-
-                // Update button states on page load
-                updateButtonStates();
-
-                // Watch for changes in PyCode text field
-                $('#poST_code').on('input', function() {
-                    updateButtonStates();
-                });
-
-                $('#changeTimeButton').click(function(e) {
-                    e.preventDefault();
-                    const timeValue = $('#time').val();
-
-                    console.log("Changing simulation time scale to:", timeValue);
-
-                    $.ajax({
-                        type: "POST",
-                        url: "/", // Adjust this if your endpoint is different
-                        data: {
-                            action: 'changeTime',
-                            timeValue: timeValue,
-                        },
-                        success: function(response) {
-                            console.log("Server response:", response);
-                        },
-                        error: function(err) {
-                            console.error("Error changing simulation time:", err);
-                        }
-                    });
-                });
-
-                $('#startSimButton').click(function(e) {
-                    e.preventDefault();
-                    console.log("Starting simulation");
-
-                    $.ajax({
-                        type: "POST",
-                        url: "/",
-                        data: { action: 'startSim', pyCode: $('#poST_code').val()},
-                        success: function(response) {
-                            console.log("Server response:", response);
-                            setSimState(true); // Set sim flag to true
-                            updateButtonStates();
-                        },
-                        error: function(err) {
-                            console.error("Error starting simulation:", err);
-                        }
-                    });
-                });
-
-                $('#stepSimButton').click(function(e) {
-                    e.preventDefault();
-                    console.log("Doing 1 step");
-
-                    $.ajax({
-                        type: "POST",
-                        url: "/",
-                        data: { action: 'stepSim', pyCode: $('#poST_code').val()},
-                        success: function(response) {
-                            console.log("Server response:", response);
-                            setSimState(true); // Set sim flag to true
-                            updateButtonStates();
-                        },
-                        error: function(err) {
-                            console.error("Error doing 1 iteration simulation:", err);
-                        }
-                    });
-                });
-
-                $('#pauseSimButton').click(function(e) {
-                    e.preventDefault();
-                    console.log("Toggling simulation pause state");
-
-                    $.ajax({
-                        type: "POST",
-                        url: "/",
-                        data: { action: 'pauseSim' },
-                        success: function(response) {
-                            console.log("Simulation pause state toggled:", response);
-                        },
-                        error: function(err) {
-                            console.error("Error pausing/unpausing simulation:", err);
-                        }
-                    });
-                });
-
-                $('#stopSimButton').click(function(e) {
-                    e.preventDefault();
-                    console.log("Stopping simulation");
-
-                    $.ajax({
-                        type: "POST",
-                        url: "/",
-                        data: { action: 'stopSim' },
-                        success: function(response) {
-                            console.log("Simulation stopped:", response);
-                            sim = false; // Ensure sim flag is set to false
-                            setSimState(false); // Just in case this also controls more states
-                            updateButtonStates(); // Update button states
-                            console.log("Button states updated. Sim flag is now:", sim);
-                        },
-                        error: function(err) {
-                            console.error("Error stopping simulation:", err);
-                        }
-                    });
-                });
-
-                $('#loadInputsButton').click(function(e) {
-                    e.preventDefault();
-                    console.log("Loading inputs");
-
-                    let inputs = {};
-                    let plant_inputs = {};
-                    let global_inputs = {};
-
-                    // Collect inputs from the assetNameMenu list
-                    $('#assetNameMenu input').each(function() {
-                        let name = $(this).attr('name');
-                        let type = $(this).attr('type');
-                        let value;
-
-                        if (type === 'checkbox') {
-                            value = $(this).is(':checked');
-                        } else if (type === 'number') {
-                            value = parseFloat($(this).val());
-                        } else {
-                            value = $(this).val();
-                        }
-
-                        inputs[name] = value;
-                    });
-
-                    // Collect inputs from the plant_assetNameMenu list
-                    $('#plant_assetNameMenu input').each(function() {
-                        let name = $(this).attr('name');
-                        let type = $(this).attr('type');
-                        let value;
-
-                        if (type === 'checkbox') {
-                            value = $(this).is(':checked');
-                        } else if (type === 'number') {
-                            value = parseFloat($(this).val());
-                        } else {
-                            value = $(this).val();
-                        }
-
-                        plant_inputs[name] = value;
-                    });
-
-                    // Collect inputs from the globals_assetNameMenu list
-                    $('#globals_assetNameMenu input').each(function() {
-                        let name = $(this).attr('name');
-                        let type = $(this).attr('type');
-                        let value;
-
-                        if (type === 'checkbox') {
-                            value = $(this).is(':checked');
-                        } else if (type === 'number') {
-                            value = parseFloat($(this).val());
-                        } else {
-                            value = $(this).val();
-                        }
-
-                        global_inputs[name] = value;
-                    });
-
-                    console.log("Inputs JSON:", inputs);
-                    console.log("Plant inputs JSON:", plant_inputs);
-                    console.log("Globals JSON:", global_inputs);
-
-                    // Form data payload
-                    let formData = new FormData();
-                    formData.append("action", "loadInputs");
-                    formData.append("inputs", JSON.stringify(inputs));
-                    formData.append("plant_inputs", JSON.stringify(plant_inputs));
-                    formData.append("global_inputs", JSON.stringify(global_inputs));
-
-                    $.ajax({
-                        type: "POST",
-                        url: "/sessions/{{session}}/load_inputs",                 // Same route for multiple actions
-                        processData: false,       // Don't convert to query string
-                        contentType: false,       // Let the browser set content type
-                        data: formData,           // Send as multipart/form-data
-                        success: function(response) {
-                            console.log("Inputs loaded successfully:", response);
-                        },
-                        error: function(xhr, status, error) {
-                            console.error("Error loading inputs:", xhr.responseText);
-                        }
-                    });
-                    updateInputs();
-                    updatePlantInputs();
-                    updateGlobals();
-                });
+              } catch (e) {
+                outputsRetryCount++;
+                if (outputsRetryCount < MAX_RETRIES) setTimeout(updateOutputs, 1000);
+              }
+            })
+            .fail(function() {
+              outputsRetryCount++;
+              if (outputsRetryCount < MAX_RETRIES) setTimeout(updateOutputs, 1000);
             });
+        }
 
-            function toggleSimState() {
-                setSimState(!sim);
-                $("input[name='sim']").val(sim);
-            }
-        </script>
-    </body>
+        if (sim) {
+          $.get("{{plant_outputs}}")
+            .done(function(data) {
+              try {
+                if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                  emptyPlantOutputsCount = 0;
+                  plantOutputsRetryCount = 0;
+                  let formattedOutput = formatNestedJson(data);
+                  $('#plant_outputs').text(formattedOutput);
+                } else {
+                  emptyPlantOutputsCount++;
+                  if (emptyPlantOutputsCount >= MAX_EMPTY_RETRIES) return;
+                  setTimeout(updateOutputs, 1000);
+                }
+              } catch (e) {
+                plantOutputsRetryCount++;
+                if (plantOutputsRetryCount < MAX_RETRIES) setTimeout(updateOutputs, 1000);
+              }
+            })
+            .fail(function() {
+              plantOutputsRetryCount++;
+              if (plantOutputsRetryCount < MAX_RETRIES) setTimeout(updateOutputs, 1000);
+            });
+        }
+      }
+
+      function formatNestedJson(obj, indent = 0) {
+        let formatted = '';
+        for (const [key, value] of Object.entries(obj)) {
+          const spaces = ' '.repeat(indent);
+          if (typeof value === 'object' && value !== null) {
+            formatted += `${spaces}${key}:\n${formatNestedJson(value, indent + 2)}`;
+          } else {
+            formatted += `${spaces}${key}: ${value}\n`;
+          }
+        }
+        return formatted;
+      }
+
+      let inputsLoaded = false;
+      let plant_inputsLoaded = false;
+      let globalsLoaded = false;
+      let updateInputsTimeout = null;
+      let updatePlantInputsTimeout = null;
+      let updateGlobalsTimeout = null;
+      let inputsRetryCount = 0;
+      let plantInputsRetryCount = 0;
+      let globalsRetryCount = 0;
+
+      function updateInputs() {
+        if (!inputsLoaded && inputsRetryCount < MAX_RETRIES) {
+          $.get("{{inputs}}")
+            .done(function(data) {
+              if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                clearTimeout(updateInputsTimeout);
+                inputsLoaded = true;
+                inputsRetryCount = 0;
+                let assetList = $('#assetNameMenu');
+                assetList.empty();
+                $.each(data, function(key, value) {
+                  if (Array.isArray(value)) return;
+                  let li = $('<li/>').addClass('ui-menu-item').attr('role', 'menuitem');
+                  let input;
+                  if (typeof value === 'boolean') {
+                    input = $('<input/>').attr('type', 'checkbox').prop('checked', value);
+                  } else if (typeof value === 'number') {
+                    input = $('<input/>').attr('type', 'number').val(value);
+                  } else {
+                    input = $('<input/>').attr('type', 'text').val(value);
+                  }
+                  input.addClass('ui-all').attr('name', key).appendTo(li);
+                  $('<label/>').addClass('ui-all').text(`${key}`).appendTo(li);
+                  li.appendTo(assetList);
+                });
+              } else {
+                scheduleRetry('inputs');
+              }
+            })
+            .fail(function() {
+              scheduleRetry('inputs');
+            });
+        }
+      }
+
+      function updatePlantInputs() {
+        if (!plant_inputsLoaded && plantInputsRetryCount < MAX_RETRIES) {
+          $.get("{{plant_inputs}}")
+            .done(function(data) {
+              if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                clearTimeout(updatePlantInputsTimeout);
+                plant_inputsLoaded = true;
+                plantInputsRetryCount = 0;
+                let assetList = $('#plant_assetNameMenu');
+                assetList.empty();
+                $.each(data, function(key, value) {
+                  if (Array.isArray(value)) return;
+                  let li = $('<li/>').addClass('ui-menu-item').attr('role', 'menuitem');
+                  let input;
+                  if (typeof value === 'boolean') {
+                    input = $('<input/>').attr('type', 'checkbox').prop('checked', value);
+                  } else if (typeof value === 'number') {
+                    input = $('<input/>').attr('type', 'number').val(value);
+                  } else {
+                    input = $('<input/>').attr('type', 'text').val(value);
+                  }
+                  input.addClass('ui-all').attr('name', key).appendTo(li);
+                  $('<label/>').addClass('ui-all').text(`${key}`).appendTo(li);
+                  li.appendTo(assetList);
+                });
+              } else {
+                scheduleRetry('plantInputs');
+              }
+            })
+            .fail(function() {
+              scheduleRetry('plantInputs');
+            });
+        }
+      }
+
+      function updateGlobals() {
+        if (!globalsLoaded && globalsRetryCount < MAX_RETRIES) {
+          $.get("{{globals}}")
+            .done(function(data) {
+              if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                clearTimeout(updateGlobalsTimeout);
+                globalsLoaded = true;
+                globalsRetryCount = 0;
+                let assetList = $('#globals_assetNameMenu');
+                assetList.empty();
+                $.each(data, function(key, value) {
+                  if (Array.isArray(value)) return;
+                  let li = $('<li/>').addClass('ui-menu-item').attr('role', 'menuitem');
+                  let input;
+                  if (typeof value === 'boolean') {
+                    input = $('<input/>').attr('type', 'checkbox').prop('checked', value);
+                  } else if (typeof value === 'number') {
+                    input = $('<input/>').attr('type', 'number').val(value);
+                  } else {
+                    input = $('<input/>').attr('type', 'text').val(value);
+                  }
+                  input.addClass('ui-all').attr('name', key).appendTo(li);
+                  $('<label/>').addClass('ui-all').text(`${key}: ${value}`).appendTo(li);
+                  li.appendTo(assetList);
+                });
+              } else {
+                scheduleRetry('globals');
+              }
+            })
+            .fail(function() {
+              scheduleRetry('globals');
+            });
+        }
+      }
+
+      function scheduleRetry(type) {
+        const retryDelay = 1000;
+        switch(type) {
+          case 'outputs':
+            outputsRetryCount++;
+            if (outputsRetryCount < MAX_RETRIES) updateOutputsTimeout = setTimeout(updateOutputs, retryDelay);
+            break;
+          case 'plantOutputs':
+            plantOutputsRetryCount++;
+            if (plantOutputsRetryCount < MAX_RETRIES) updatePlantOutputsTimeout = setTimeout(updateOutputs, retryDelay);
+            break;
+          case 'inputs':
+            inputsRetryCount++;
+            if (inputsRetryCount < MAX_RETRIES) updateInputsTimeout = setTimeout(updateInputs, retryDelay);
+            break;
+          case 'plantInputs':
+            plantInputsRetryCount++;
+            if (plantInputsRetryCount < MAX_RETRIES) updatePlantInputsTimeout = setTimeout(updatePlantInputs, retryDelay);
+            break;
+          case 'globals':
+            globalsRetryCount++;
+            if (globalsRetryCount < MAX_RETRIES) updateGlobalsTimeout = setTimeout(updateGlobals, retryDelay);
+            break;
+        }
+      }
+
+      function setSimState(state) {
+        sim = state;
+        if (sim) {
+          outputsRetryCount = 0;
+          plantOutputsRetryCount = 0;
+          inputsRetryCount = 0;
+          plantInputsRetryCount = 0;
+          globalsRetryCount = 0;
+          emptyOutputsCount = 0;
+          emptyPlantOutputsCount = 0;
+          outputsLoaded = false;
+          plantOutputsLoaded = false;
+          inputsLoaded = false;
+          plant_inputsLoaded = false;
+          globalsLoaded = false;
+          if (outputsInterval) clearInterval(outputsInterval);
+          outputsInterval = setInterval(updateOutputs, 1000);
+          updateInputs();
+          updatePlantInputs();
+          updateGlobals();
+        } else {
+          clearInterval(outputsInterval);
+          outputsInterval = null;
+          clearAllTimeouts();
+          isPaused = false;
+        }
+        updateButtonStates();
+      }
+
+      function clearAllTimeouts() {
+        clearTimeout(updateOutputsTimeout);
+        clearTimeout(updatePlantOutputsTimeout);
+        clearTimeout(updateInputsTimeout);
+        clearTimeout(updatePlantInputsTimeout);
+        clearTimeout(updateGlobalsTimeout);
+      }
+
+      function getEditorValues() {
+        if (editors['poST']) document.getElementById('hidden-poST').value = editors['poST'].getValue();
+        if (editors['plant-poST']) document.getElementById('hidden-plant-poST').value = editors['plant-poST'].getValue();
+        if (editors['py']) document.getElementById('hidden-py').value = editors['py'].getValue();
+        if (editors['plant-py']) document.getElementById('hidden-plant-py').value = editors['plant-py'].getValue();
+      }
+
+      $('#changeTimeButton').click(function(e) {
+        e.preventDefault();
+        getEditorValues();
+        const timeValue = $('#time').val();
+        $.ajax({
+          type: "POST",
+          url: "/",
+          data: { action: 'changeTime', timeValue: timeValue },
+          success: function(response) {},
+          error: function(err) {}
+        });
+      });
+
+      $('#startSimButton').click(function(e) {
+        e.preventDefault();
+        getEditorValues();
+        $.ajax({
+          type: "POST",
+          url: "/",
+          data: { action: 'startSim' },
+          success: function(response) {
+            isPaused = false;
+            setSimState(true);
+          },
+          error: function(err) {}
+        });
+      });
+
+      $('#stepSimButton').click(function(e) {
+        e.preventDefault();
+        getEditorValues();
+        $.ajax({
+          type: "POST",
+          url: "/",
+          data: { action: 'stepSim' },
+          success: function(response) {
+            isPaused = true;
+            setSimState(true);
+          },
+          error: function(err) {}
+        });
+      });
+
+      $('#pauseSimButton').click(function(e) {
+        e.preventDefault();
+        isPaused = !isPaused;
+        updateButtonStates();
+        $.ajax({
+          type: "POST",
+          url: "/",
+          data: { action: 'pauseSim' },
+          success: function(response) {
+            console.log("Simulation " + (isPaused ? "paused" : "resumed"));
+          },
+          error: function(err) {
+            console.error("Error toggling pause:", err);
+            // Revert state on error
+            isPaused = !isPaused;
+            updateButtonStates();
+          }
+        });
+      });
+
+      $('#stopSimButton').click(function(e) {
+        e.preventDefault();
+        $.ajax({
+          type: "POST",
+          url: "/",
+          data: { action: 'stopSim' },
+          success: function(response) {
+            setSimState(false);
+          },
+          error: function(err) {}
+        });
+      });
+
+      $('#loadInputsButton').click(function(e) {
+        e.preventDefault();
+        let inputs = {};
+        let plant_inputs = {};
+        let global_inputs = {};
+        $('#assetNameMenu input').each(function() {
+          let name = $(this).attr('name');
+          let type = $(this).attr('type');
+          let value = type === 'checkbox' ? $(this).is(':checked') :
+                     type === 'number' ? parseFloat($(this).val()) : $(this).val();
+          inputs[name] = value;
+        });
+        $('#plant_assetNameMenu input').each(function() {
+          let name = $(this).attr('name');
+          let type = $(this).attr('type');
+          let value = type === 'checkbox' ? $(this).is(':checked') :
+                     type === 'number' ? parseFloat($(this).val()) : $(this).val();
+          plant_inputs[name] = value;
+        });
+        $('#globals_assetNameMenu input').each(function() {
+          let name = $(this).attr('name');
+          let type = $(this).attr('type');
+          let value = type === 'checkbox' ? $(this).is(':checked') :
+                     type === 'number' ? parseFloat($(this).val()) : $(this).val();
+          global_inputs[name] = value;
+        });
+        let formData = new FormData();
+        formData.append("action", "loadInputs");
+        formData.append("inputs", JSON.stringify(inputs));
+        formData.append("plant_inputs", JSON.stringify(plant_inputs));
+        formData.append("global_inputs", JSON.stringify(global_inputs));
+        $.ajax({
+          type: "POST",
+          url: "/sessions/{{session}}/load_inputs",
+          processData: false,
+          contentType: false,
+          data: formData,
+          success: function(response) {
+            updateInputs();
+            updatePlantInputs();
+            updateGlobals();
+          },
+          error: function(xhr, status, error) {}
+        });
+      });
+
+      updateButtonStates();
+      if (editors['py']) {
+        editors['py'].onDidChangeModelContent(updateButtonStates);
+      }
+    }
+
+    function initWhenEditorVisible() {
+      if ($('#editor-poST:visible').length > 0) {
+        createMonacoEditors();
+      } else {
+        const observer = new MutationObserver(() => {
+          if ($('#editor-poST:visible').length > 0) {
+            observer.disconnect();
+            createMonacoEditors();
+          }
+        });
+        observer.observe(document.body, { subtree: true, attributes: true });
+      }
+    }
+
+    initWhenEditorVisible();
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function() {
+      Object.values(editors).forEach(editor => editor.layout());
+    });
+  });
+  </script>
+</body>
 </html>
