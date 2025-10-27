@@ -8,7 +8,7 @@ import psutil
 import api_file_map
 
 from file_utils import read_from_file
-from code_management import translate, openPoST
+from code_management import translate, openPoST, savePoST
 from simulation_control import startSimJSON, stopSimJSON, pauseSimJSON, stepOnceJSON, changeTime
 from rendering import render_index
 
@@ -26,6 +26,9 @@ def user_post_methods():
     user_path = 'sessions/' + str(session['user']) + '/'
 
     print(request, request.form['action'])
+
+    if request.form["action"] == "savePoST":
+        return savePoST(user_path)
 
     if request.form["action"] == "translate":
         return translate(clientSocket, user_path)

@@ -40,14 +40,16 @@
               <div id="editor-poST" style="width: 100%; height: 100%;"></div>
               <input type="hidden" name="poST_code" id="hidden-poST">
             </div>
-            <button type="submit" class="btn btn-light" name="action" value="downloadPoST" style="margin-top: 1%; min-height:14px; max-height: 40px; width: 100%">Download</button>
+            <button type="submit" class="btn btn-light" name="action" value="downloadPoST" style="margin-top: 1%; min-height:14px; max-height: 40px; width: 49%">Download</button>
+            <button type="submit" id="savePoST" class="btn btn-light" name="action" value="savePoST" style="margin-top: 1%; min-height:14px; max-height: 40px; width: 49%">Save</button>
           </div>
           <div class="tab-pane fade" id="plant-post" role="tabpanel" style="height: 100%;">
             <div class="editor-container" style="height: 88%; min-height:200px; overflow: hidden;">
               <div id="editor-plant-poST" style="width: 100%; height: 100%;"></div>
               <input type="hidden" name="plant_poST_code" id="hidden-plant-poST">
             </div>
-            <button type="submit" class="btn btn-light" name="action" value="downloadPoST_plant" style="margin-top:1%; min-height:14px; max-height: 40px; width: 100%">Download</button>
+            <button type="submit" class="btn btn-light" name="action" value="downloadPoST_plant" style="margin-top:1%; min-height:14px; max-height: 40px; width: 49%">Download</button>
+            <button type="submit" id="savePoSTPlant" class="btn btn-light" name="action" value="savePoST" style="margin-top: 1%; min-height:14px; max-height: 40px; width: 49%">Save</button>
           </div>
           <div class="tab-pane fade" id="py" role="tabpanel" style="height: 100%;">
             <div class="editor-container" style="height: 88%; min-height:200px; overflow: hidden;">
@@ -204,12 +206,15 @@
         monaco.languages.setMonarchTokensProvider('post', {
           defaultToken: '',
           keywords: [
-            'PROGRAM', 'END_PROGRAM', 'VAR', 'VAR_INPUT', 'VAR_OUTPUT', 'VAR_GLOBAL', 'END_VAR',
-            'PROCESS', 'END_PROCESS', 'STATE', 'END_STATE', 'TIMEOUT', 'END_TIMEOUT',
+            'CONFIGURATION', 'END_CONFIGURATION',
+            'PROGRAM', 'END_PROGRAM',
+            'VAR', 'VAR_INPUT', 'VAR_OUTPUT', 'VAR_GLOBAL', 'VAR_PROCESS', 'END_VAR',
+            'PROCESS', 'END_PROCESS', 'STATE', 'END_STATE', 'TIMEOUT', 'END_TIMEOUT', 'FUNCTION', 'END_FUNCTION',
             'START', 'STOP', 'SET', 'NEXT', 'AND', 'OR', 'XOR',
-            'IF', 'THEN', 'ELSE', 'END_IF', 'CASE', 'OF', 'END_CASE',
-            'FOR', 'TO', 'BY', 'DO', 'END_FOR', 'WHILE', 'DO', 'END_WHILE',
-            'REPEAT', 'UNTIL', 'END_REPEAT', 'EXIT', 'RETURN'
+            'IF', 'THEN',  'ELSIF', 'ELSE', 'END_IF', 'CASE', 'OF', 'END_CASE',
+            'FOR', 'TO', 'BY', 'DO', 'END_FOR', 'WHILE', 'END_WHILE',
+            'REPEAT', 'UNTIL', 'END_REPEAT', 'EXIT', 'RETURN',
+            'ACTIVE', 'RESOURCE', 'END_RESOURCE', 'CONSTANT', 'INTERVAL', 'PRIORITY', 'LOOPED', 'WITH', 'ON'
           ],
           typeKeywords: [
             'BOOL', 'BYTE', 'WORD', 'DWORD', 'INT', 'DINT', 'REAL', 'LREAL',
@@ -248,19 +253,37 @@
               [/[;,.]/, 'delimiter'],
               [/"([^"\\]|\\.)*$/, 'string.invalid'],
               [/"/, 'string', '@string'],
+
+              // Single-line comment
               [/\/\/.*$/, 'comment'],
-              [/\/\*/, 'comment', '@comment']
+
+              // Block comments /* ... */
+              [/\/\*/, 'comment', '@comment'],
+
+              // NEW: Pascal/F# style comment block (* ... *)
+              [/\(\*/, 'comment', '@parenComment']
             ],
+
             whitespace: [
               [/[ \t\r\n]+/, 'white'],
               [/\/\*/, 'comment', '@comment'],
-              [/\/\/.*$/, 'comment']
+              [/\/\/.*$/, 'comment'],
+              [/\(\*/, 'comment', '@parenComment']  // Also detect in whitespace
             ],
+
             comment: [
               [/[^\/*]+/, 'comment'],
               [/\*\//, 'comment', '@pop'],
               [/[\/*]/, 'comment']
             ],
+
+            // NEW: (* ... *) comment state
+              parenComment: [
+              [/[^*()]+/, 'comment'],
+              [/\*\)/, 'comment', '@pop'],      // end of (* ... *)
+              [/[()*]/, 'comment']             // stay in comment
+            ],
+
             string: [
               [/[^\\"]+/, 'string'],
               [/@escapes/, 'string.escape'],
@@ -280,6 +303,7 @@
             { token: 'number', foreground: '098658' },
             { token: 'string', foreground: 'A31515' },
             { token: 'comment', foreground: '008000' },
+            { token: 'parenComment', foreground: '008000' },
             { token: 'identifier', foreground: '001080' },
             { token: 'delimiter', foreground: '000000' }
           ],
@@ -660,6 +684,56 @@
         if (editors['py']) document.getElementById('hidden-py').value = editors['py'].getValue();
         if (editors['plant-py']) document.getElementById('hidden-plant-py').value = editors['plant-py'].getValue();
       }
+
+      $('#savePoST').click(function(e) {
+        e.preventDefault();
+        getEditorValues();
+
+        const poST_code = $('#hidden-poST').val() || $('#hidden-poST').text();
+        const plant_poST_code = $('#hidden-plant-poST').val() || $('#hidden-plant-poST').text();
+
+        $.ajax({
+          type: "POST",
+          url: "/",
+          data: {
+            action: 'savePoST',
+            poST_code: poST_code,
+            plant_poST_code: plant_poST_code
+          },
+          success: function(response) {
+            alert("✅ Save successful!");
+          },
+          error: function(err) {
+            alert("❌ Save failed. Please try again.");
+            console.error(err);
+          }
+        });
+      });
+
+      $('#savePoSTPlant').click(function(e) {
+        e.preventDefault();
+        getEditorValues();
+
+        const poST_code = $('#hidden-poST').val() || $('#hidden-poST').text();
+        const plant_poST_code = $('#hidden-plant-poST').val() || $('#hidden-plant-poST').text();
+
+        $.ajax({
+          type: "POST",
+          url: "/",
+          data: {
+            action: 'savePoST',
+            poST_code: poST_code,
+            plant_poST_code: plant_poST_code
+          },
+          success: function(response) {
+            alert("✅ Save successful!");
+          },
+          error: function(err) {
+            alert("❌ Save failed. Please try again.");
+            console.error(err);
+          }
+        });
+      });
 
       $('#changeTimeButton').click(function(e) {
         e.preventDefault();

@@ -1,3 +1,4 @@
+import json
 import subprocess
 import os
 import socket
@@ -20,12 +21,19 @@ def save_code(path, code, filename):
         f.close()
 
 
-def translate(clientSocket, user_path):
-    stopSimJSON(user_path)
+def savePoST(user_path):
     poST_code = request.form["poST_code"]
     plant_code = request.form["plant_poST_code"]
     save_code(user_path, poST_code, "code.post")
     save_code(user_path, plant_code, "plant_code.post")
+    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+
+
+def translate(clientSocket, user_path):
+    stopSimJSON(user_path)
+    poST_code = request.form["poST_code"]
+    plant_code = request.form["plant_poST_code"]
+    savePoST(user_path)
     try:
         clientSocket.connect(("localhost", 8081))
         clientSocket.send((user_path + '\n').encode())
