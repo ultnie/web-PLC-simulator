@@ -11,5 +11,11 @@ FILE_MAP = {
     "plant_times": "plant_times",
     "plant_globvars": "plant_global_vars",
     "plant_vars": "plant_vars",
-    "time_scale": "time_scale"
+    "time_scale": "time_scale",
+    "control_outputs": "control_all",
+    "control_states": "control_states",
+    "control_inputs": "control_inputs",
+    "control_times": "control_times",
+    "control_global_vars": "control_global_vars",
+    "control_vars": "control_vars",
 }
