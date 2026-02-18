@@ -18,12 +18,12 @@ def render_index(poST_code, plant_code, Py_code, plant_Py_code, out, plant_out, 
         inputs=path + "control_inputs",
         plant_inputs=path + "plant_inputs",
         globals=path + "control_global_vars",
-        sim=str(sim).lower(),
-        pause=str(pause).lower(),
+        sim=bool(sim),
+        pause=bool(pause),
+
         editor=visualization_ports.editor_port,
         viewer=visualization_ports.viewer_port,
     )
-
 
     if sim:
         base_params['disable_start'] = "disabled"

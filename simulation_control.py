@@ -1,4 +1,3 @@
-import json
 import shutil
 import os
 import api_file_map
@@ -51,11 +50,14 @@ def startSimJSON(user_path):
 
         simulation_process[user_path] = subprocess.Popen(f"./startSim.sh {user_path}", shell=True)
 
-        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+        return jsonify(
+            success=True,
+            sim=simulation_status[user_path],
+            paused=pauses[user_path])
 
     except Exception as e:
         print(f"Error: {e}")
-        return json.dumps({'success': False, 'error': str(e)}), 400, {'ContentType': 'application/json'}
+        return jsonify(success=False, error=str(e)), 400
 
 
 def pauseSimJSON(user_path):
@@ -81,11 +83,11 @@ def pauseSimJSON(user_path):
             f.write(f"{stopSim}\n{str(pauseSim)}\n{stepOnce}\n")
 
         print("Simulation paused:", pauseSim)
-        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+        return jsonify(success=True, sim=simulation_status[user_path], paused=pauses[user_path])
 
     except Exception as e:
         print(f"Error in pauseSimJSON: {e}")
-        return json.dumps({'success': False, 'error': str(e)}), 400, {'ContentType': 'application/json'}
+        return jsonify(success=False, error=str(e)), 400
 
 
 def stopSimJSON(user_path):
@@ -124,11 +126,11 @@ def stopSimJSON(user_path):
         simulation_process[user_path] = None
         print("Simulation stopped")
 
-        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+        return jsonify(success=True, sim=False, paused=False)
 
     except Exception as e:
         print(f"Error in stopSimJSON: {e}")
-        return json.dumps({'success': False, 'error': str(e)}), 400, {'ContentType': 'application/json'}
+        return jsonify(success=False, error=str(e)), 400
 
 
 def stepOnceJSON(user_path):
@@ -171,11 +173,11 @@ def stepOnceJSON(user_path):
             print("Simulation not running — starting it.")
             simulation_process[user_path] = subprocess.Popen(f"./startSim.sh {user_path}", shell=True)
 
-        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+        return jsonify(success=True, sim=True, paused=True)
 
     except Exception as e:
         print(f"Error in stepOnceJSON: {e}")
-        return json.dumps({'success': False, 'error': str(e)}), 400, {'ContentType': 'application/json'}
+        return jsonify(success=False, error=str(e), sim=simulation_status.get(user_path, False), paused=pauses.get(user_path, False)), 400
 
 
 def changeTime(user_path):

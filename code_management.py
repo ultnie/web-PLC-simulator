@@ -1,9 +1,8 @@
-import json
 import subprocess
 import os
 import socket
 from file_utils import read_from_file
-from flask import request, session
+from flask import request, session, jsonify
 from rendering import render_index
 from simulation_control import stopSimJSON
 
@@ -22,11 +21,15 @@ def save_code(path, code, filename):
 
 
 def savePoST(user_path):
-    poST_code = request.form["poST_code"]
-    plant_code = request.form["plant_poST_code"]
-    save_code(user_path, poST_code, "code.post")
-    save_code(user_path, plant_code, "plant_code.post")
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    try:
+        poST_code = request.form["poST_code"]
+        plant_code = request.form["plant_poST_code"]
+        save_code(user_path, poST_code, "code.post")
+        save_code(user_path, plant_code, "plant_code.post")
+        return jsonify(success=True)
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify(success=False, error=str(e)), 400
 
 
 def translate(clientSocket, user_path):
