@@ -125,12 +125,9 @@
         <button type="submit" class="btn btn-light" name="action" value="openPoST" style="margin-bottom: 20px; height: 50px;">Open</button>
       </div>
       <div class="col">
-        <button type="submit" id="translateButton" class="btn btn-light" name="action" value="translate" style="margin-bottom: 10px; height: 40px; width: 100%">Translate</button>
-        <div>Visualization:</div>
-        <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{editor}}?session={{session}}', 'editorPopupWindow', 'location=yes, resizable=yes, scrollbars=yes, fullscreen=yes'); return false;">Editor</a>
-        <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{editor}}?session={{session}}', 'editorTab'); return false;">Editor</a>
-        <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{viewer}}?session={{session}}', 'viewerPopupWindow', 'location=yes, resizable=yes, scrollbars=yes, fullscreen=yes'); return false;">Viewer</a>
-        <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open(window.location.protocol + '//' + window.location.hostname + ':{{viewer}}?session={{session}}', 'viewerTab'); return false;">Viewer</a>
+        <button type="submit" id="translateButton" class="btn btn-light" name="action" value="translate" style="margin-bottom: 10px; height: 40px; width: 100%">Translate</button>        <div>Visualization:</div>
+        <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open('http://' + '84.244.58.221' + ':{{editor}}?session={{session}}', 'editorTab'); return false;">Editor</a>
+        <a href="#" class="btn btn-light" style="margin-bottom: 10px; height: 40px; width: 100%" onclick="window.open('http://' + '84.244.58.221' + ':{{viewer}}?session={{session}}', 'viewerTab'); return false;">Viewer</a>
       </div>
       <div class="col">
         <button type="submit" id="startSimButton" class="btn btn-light" name="action" value="startSim" style="margin-bottom: 10px; height: 40px;">Start</button>
