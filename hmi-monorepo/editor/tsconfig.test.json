@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": {
+    "outDir": "./dist-tests",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "allowJs": false,
+    "noEmit": false,
+    "declaration": false,
+    "sourceMap": false,
+    "types": ["node"],
+    "rootDir": ".",
+    "allowImportingTsExtensions": false
+  },
+  "include": [
+    "tests/**/*.ts",
+    "src/utils/**/*.ts"
+  ]
+}

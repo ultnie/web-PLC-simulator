@@ -1,0 +1,33 @@
+{
+  "name": "hmi-monorepo",
+  "version": "1.0.0",
+  "workspaces": [
+    "editor",
+    "viewer"
+  ],
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev:editor": "npm run dev --workspace=editor",
+    "dev:viewer": "npm run dev --workspace=viewer",
+    "dev": "npm-run-all --parallel dev:editor dev:viewer",
+    "build:editor": "npm run build --workspace=editor",
+    "build:viewer": "npm run build --workspace=viewer",
+    "build": "npm-run-all --parallel build:editor build:viewer",
+    "preview:editor": "npm run preview --workspace=editor",
+    "preview:viewer": "npm run preview --workspace=viewer"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/fabric": "^5.3.10",
+    "@types/node": "^22.15.17"
+  },
+  "dependencies": {
+    "@vicons/ionicons5": "^0.13.0",
+    "naive-ui": "^2.41.0",
+    "vuex": "^4.1.0"
+  }
+}
