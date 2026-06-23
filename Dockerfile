@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 RUN apt-get update
 RUN echo "**** Installing Python and Java****" && \
-    apt-get install -y build-essential python3-pip openjdk-17-jdk ant
+    apt-get install -y build-essential python3-pip openjdk-21-jdk ant
 WORKDIR /app
 COPY webUI.py webUI.py
 COPY api_file_map.py api_file_map.py
